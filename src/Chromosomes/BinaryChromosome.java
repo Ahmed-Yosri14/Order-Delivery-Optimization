@@ -12,7 +12,41 @@ public class BinaryChromosome implements Chromosome {
 
     public BinaryChromosome() {
         this.genes = new ArrayList<>();
-        this.fitness = (Integer) 0;
+        this.fitness = Integer.valueOf(0);
+    }
+
+    // Constructor for deep copy
+    public BinaryChromosome(List<List<Boolean>> genes) {
+        this.genes = new ArrayList<>();
+        for (List<Boolean> row : genes) {
+            List<Boolean> newRow = new ArrayList<>();
+            for (Boolean value : row) {
+                newRow.add(Boolean.valueOf(value.booleanValue()));
+            }
+            this.genes.add(newRow);
+        }
+    }
+
+    @Override
+    public Chromosome copy() {
+        // Create a deep copy of the 2D genes array
+        List<List<Boolean>> copiedGenes = new ArrayList<>();
+        for (List<Boolean> row : this.genes) {
+            List<Boolean> copiedRow = new ArrayList<>();
+            for (Boolean value : row) {
+                copiedRow.add(Boolean.valueOf(value.booleanValue()));
+            }
+            copiedGenes.add(copiedRow);
+        }
+
+        BinaryChromosome copy = new BinaryChromosome(copiedGenes);
+
+        // Copy the fitness value
+        if (this.fitness != null) {
+            copy.setFitness(Integer.valueOf(this.fitness.intValue()));
+        }
+
+        return copy;
     }
 
     @Override
@@ -39,7 +73,7 @@ public class BinaryChromosome implements Chromosome {
 
         // Assign each order to its position in the permutation
         for (int position = 0; position < numberOfGenes; position++) {
-            int orderIndex = orderIndices.get(position);
+            int orderIndex = orderIndices.get(position).intValue();
             genes.get(orderIndex).set(position, Boolean.valueOf(true));
         }
     }
@@ -57,7 +91,11 @@ public class BinaryChromosome implements Chromosome {
     public void setGenes(List<List<Boolean>> genes) {
         this.genes = new ArrayList<>();
         for (List<Boolean> row : genes) {
-            this.genes.add(new ArrayList<>(row));
+            List<Boolean> newRow = new ArrayList<>();
+            for (Boolean value : row) {
+                newRow.add(Boolean.valueOf(value.booleanValue()));
+            }
+            this.genes.add(newRow);
         }
     }
 
@@ -78,7 +116,7 @@ public class BinaryChromosome implements Chromosome {
         for (int position = 0; position < numOrders; position++) {
             // Find which order (row) has 1 at this position
             for (int order = 0; order < numOrders; order++) {
-                if (genes.get(order).get(position)) {
+                if (genes.get(order).get(position).booleanValue()) {
                     sequence.add(Integer.valueOf(order));
                     break;
                 }
@@ -101,7 +139,7 @@ public class BinaryChromosome implements Chromosome {
         for (int i = 0; i < genes.size(); i++) {
             sb.append("  Order ").append(i).append(": [");
             for (int j = 0; j < genes.get(i).size(); j++) {
-                sb.append(genes.get(i).get(j) ? "1" : "0");
+                sb.append(genes.get(i).get(j).booleanValue() ? "1" : "0");
                 if (j < genes.get(i).size() - 1) sb.append(", ");
             }
             sb.append("]\n");
@@ -115,11 +153,9 @@ public class BinaryChromosome implements Chromosome {
         return sb.toString();
     }
 
-    // Create a deep copy of this chromosome
+    // Optional: Override clone() method as well
+    @Override
     public BinaryChromosome clone() {
-        BinaryChromosome copy = new BinaryChromosome();
-        copy.setGenes(this.genes);
-        copy.setFitness(this.fitness);
-        return copy;
+        return (BinaryChromosome) this.copy();
     }
 }
