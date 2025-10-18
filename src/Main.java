@@ -56,10 +56,17 @@ public class Main {
 
             // Find best chromosome
             BinaryChromosome best = (BinaryChromosome) population.get(0);
+            int bestTime = ((BinaryFitnessEvaluator) evaluator).calculateTotalRouteTime(best);
+
             for (Chromosome c : population) {
                 BinaryChromosome bc = (BinaryChromosome) c;
-                if (bc.getFitness() > best.getFitness()) {
+                int bcTime = ((BinaryFitnessEvaluator) evaluator).calculateTotalRouteTime(bc);
+
+                // Better if: higher fitness OR (same fitness but shorter time)
+                if (bc.getFitness() > best.getFitness() ||
+                        (bc.getFitness() == best.getFitness() && bcTime < bestTime)) {
                     best = bc;
+                    bestTime = bcTime;
                 }
             }
 
