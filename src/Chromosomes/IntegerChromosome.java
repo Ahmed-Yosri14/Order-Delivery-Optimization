@@ -16,7 +16,12 @@ public class IntegerChromosome implements Chromosome{
     public void generateGenes(int numberOfGenes) {
         Genes = new ArrayList<Integer>();
         for (int i = 0; i < numberOfGenes; i++) {
-            Genes.add(rand.nextInt(100));
+            Genes.add(Integer.valueOf(rand.nextInt(100)));
         }
+    }
+
+    @Override
+    public Chromosome copy() {
+        return null;
     }
 }

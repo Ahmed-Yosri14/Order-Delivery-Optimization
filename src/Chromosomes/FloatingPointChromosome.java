@@ -12,7 +12,14 @@ public class FloatingPointChromosome implements Chromosome {
     @Override
     public void generateGenes(int numberOfGenes) {
         for (int i = 0; i < numberOfGenes; i++) {
-            genes.add(Math.random());
+            genes.add(Double.valueOf(Math.random()));
         }
     }
+
+    @Override
+    public Chromosome copy() {
+        return null;
+    }
+
+
 }
