@@ -80,7 +80,45 @@ public class BinaryChromosome implements Chromosome {
 
     @Override
     public void mutate(double probability) {
-        // Mutation implementation will be added later
+        // Check if mutation should occur
+        if (random.nextDouble() > probability) {
+            return; // No mutation
+        }
+
+        int size = genes.size();
+
+        // Need at least 2 orders to swap
+        if (size < 2) {
+            return;
+        }
+
+        // Select two different random positions
+        int pos1 = random.nextInt(size);
+        int pos2;
+        do {
+            pos2 = random.nextInt(size);
+        } while (pos2 == pos1);
+
+        // Find which orders are at these positions
+        int order1 = -1, order2 = -1;
+
+        for (int i = 0; i < size; i++) {
+            if (genes.get(i).get(pos1)) {
+                order1 = i;
+            }
+            if (genes.get(i).get(pos2)) {
+                order2 = i;
+            }
+        }
+
+        // Swap: set order1 to pos2 and order2 to pos1
+        if (order1 != -1 && order2 != -1) {
+            genes.get(order1).set(pos1, false);
+            genes.get(order1).set(pos2, true);
+
+            genes.get(order2).set(pos2, false);
+            genes.get(order2).set(pos1, true);
+        }
     }
 
     // Getters
