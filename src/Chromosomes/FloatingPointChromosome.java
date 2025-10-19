@@ -1,9 +1,20 @@
 package Chromosomes;
 
+import Fitness.FloatingPointFitnessEvaluator;
+import Helpers.Pair;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FloatingPointChromosome implements Chromosome {
     List<Double> genes;
+    FloatingPointFitnessEvaluator evaluator = FloatingPointFitnessEvaluator.getInstance();
+
+    public FloatingPointChromosome(List<Double> genes) {
+        this.genes = new ArrayList<>(genes);
+    }
+    @Override
     public void mutateMethod1(double probability) {
 
     }
@@ -15,17 +26,17 @@ public class FloatingPointChromosome implements Chromosome {
 
     @Override
     public int getFitness() {
-        return 0;
+        return evaluator.evaluate(this);
     }
 
     @Override
     public Chromosome clone() {
-        return null;
+        return new FloatingPointChromosome(this.genes);
     }
 
     @Override
     public int getTotalRouteTime() {
-        return 0;
+        return evaluator.calculateTotalRouteTime(this);
     }
 
     @Override
@@ -37,7 +48,17 @@ public class FloatingPointChromosome implements Chromosome {
 
     @Override
     public List<Integer> getDeliverySequence() {
-        return List.of();
+        List<Integer>seq;
+        seq = new ArrayList<Integer>();
+        ArrayList<Pair> arr = new ArrayList<Pair>();
+        for (int i = 0; i < genes.size(); i++) {
+            arr.add(new Pair (this.genes.get(i),i+1));
+        }
+        Collections.sort(arr);
+        for (int i = 0; i < arr.size(); i++) {
+            seq.add(arr.get(i).getIdx());
+        }
+        return seq;
     }
 
 

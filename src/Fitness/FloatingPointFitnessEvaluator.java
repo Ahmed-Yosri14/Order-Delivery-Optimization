@@ -1,33 +1,33 @@
 package Fitness;
 
-import Chromosomes.BinaryChromosome;
 import Chromosomes.Chromosome;
+import Chromosomes.FloatingPointChromosome;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class BinaryFitnessEvaluator implements FitnessEvaluator {
+public class FloatingPointFitnessEvaluator implements FitnessEvaluator {
 
-    private static BinaryFitnessEvaluator instance;
+    private static FloatingPointFitnessEvaluator instance;
 
-    private ArrayList<ArrayList<Integer>> distanceMatrix;
-    private int timeConstraint;
-    private static final int DEPOT = 0;
+    private final ArrayList<ArrayList<Integer>> distanceMatrix;
+    private final int timeConstraint;
 
-    private BinaryFitnessEvaluator(ArrayList<ArrayList<Integer>> distanceMatrix, int timeConstraint) {
+    private FloatingPointFitnessEvaluator(ArrayList<ArrayList<Integer>> distanceMatrix, int timeConstraint) {
         this.distanceMatrix = distanceMatrix;
         this.timeConstraint = timeConstraint;
     }
 
-    public static synchronized BinaryFitnessEvaluator getInstance(ArrayList<ArrayList<Integer>> distanceMatrix, int timeConstraint) {
+    public static synchronized FloatingPointFitnessEvaluator getInstance(ArrayList<ArrayList<Integer>> distanceMatrix, int timeConstraint) {
         if (instance == null) {
-            instance = new BinaryFitnessEvaluator(distanceMatrix, timeConstraint);
+            instance = new FloatingPointFitnessEvaluator(distanceMatrix, timeConstraint);
         }
         return instance;
     }
 
-    public static synchronized BinaryFitnessEvaluator getInstance() {
+    public static synchronized FloatingPointFitnessEvaluator getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("BinaryFitnessEvaluator not initialized. Call getInstance(distanceMatrix, timeConstraint) first.");
+            throw new IllegalStateException("FloatingPointFitnessEvaluator not initialized. Call getInstance(distanceMatrix, timeConstraint) first.");
         }
         return instance;
     }
@@ -38,13 +38,13 @@ public class BinaryFitnessEvaluator implements FitnessEvaluator {
 
     @Override
     public Integer evaluate(Chromosome chromosome) {
-        if (!(chromosome instanceof BinaryChromosome)) {
-            throw new IllegalArgumentException("BinaryFitnessEvaluator can only evaluate BinaryChromosome");
+        if (!(chromosome instanceof FloatingPointChromosome)) {
+            throw new IllegalArgumentException("FloatingPointFitnessEvaluator can only evaluate FloatingPointChromosome");
         }
-        return evaluateBinary((BinaryChromosome) chromosome);
+        return evaluateFloatingPoint((FloatingPointChromosome) chromosome);
     }
 
-    public int evaluateBinary(BinaryChromosome chromosome) {
+    private int evaluateFloatingPoint(Chromosome chromosome) {
         List<Integer> deliverySequence = chromosome.getDeliverySequence();
 
         if (deliverySequence.isEmpty()) return 0;
