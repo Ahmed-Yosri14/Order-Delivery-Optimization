@@ -4,9 +4,28 @@ import java.util.List;
 
 public class FloatingPointChromosome implements Chromosome {
     List<Double> genes;
-    @Override
-    public void mutate(double probability) {
+    public void mutateMethod1(double probability) {
 
+    }
+
+    @Override
+    public void mutateMethod2(double probability) {
+
+    }
+
+    @Override
+    public int getFitness() {
+        return 0;
+    }
+
+    @Override
+    public Chromosome clone() {
+        return null;
+    }
+
+    @Override
+    public int getTotalRouteTime() {
+        return 0;
     }
 
     @Override
@@ -17,9 +36,10 @@ public class FloatingPointChromosome implements Chromosome {
     }
 
     @Override
-    public Chromosome copy() {
-        return null;
+    public List<Integer> getDeliverySequence() {
+        return List.of();
     }
+
 
 
 }

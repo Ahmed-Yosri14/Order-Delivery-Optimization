@@ -1,324 +1,397 @@
-import Chromosomes.BinaryChromosome;
-import Chromosomes.Chromosome;
+import Chromosomes.*;
+import Crossover.*;
 import Fitness.*;
 import Selection.*;
-import Crossover.*;
 
 import java.util.*;
 
+/**
+ * Main class for Genetic Algorithm Order Delivery Optimization
+ * 
+ * This program implements a comprehensive genetic algorithm with the following phases:
+ * 
+ * PHASE 1: PROBLEM SETUP & PARAMETER CONFIGURATION
+ * - User input for algorithm parameters
+ * - Distance matrix generation for delivery points
+ * - Time constraint definition
+ * 
+ * PHASE 2: CHROMOSOME REPRESENTATION & INITIALIZATION
+ * - Binary Chromosome: Matrix representation for order positions
+ * - Integer Chromosome: Direct sequence representation
+ * - Floating Point Chromosome: Continuous value representation
+ * - Population initialization using Initializer class
+ * 
+ * PHASE 3: FITNESS EVALUATION
+ * - BinaryFitnessEvaluator: Evaluates binary chromosome fitness
+ * - IntegerFitnessEvaluator: Evaluates integer chromosome fitness
+ * - Time constraint validation
+ * - Route optimization scoring
+ * 
+ * PHASE 4: SELECTION OPERATORS
+ * - Tournament Selection: Competitive selection with configurable tournament size
+ * - Roulette Wheel Selection: Probability-based selection
+ * - Mating pool creation and parent selection
+ * 
+ * PHASE 5: CROSSOVER OPERATORS
+ * - OrderOneCrossover: Order-based crossover for binary chromosomes
+ * - IntegerCrossover: Single-point crossover for integer chromosomes
+ * - Probability-based crossover application
+ * 
+ * PHASE 6: MUTATION OPERATORS
+ * - Method 1: Position swapping mutation
+ * - Method 2: Position shifting mutation
+ * - Probability-based mutation application
+ * 
+ * PHASE 7: EVOLUTIONARY LOOP
+ * - Generation-by-generation evolution
+ * - Elite preservation strategy
+ * - Population replacement
+ * - Convergence tracking
+ * 
+ * PHASE 8: RESULTS ANALYSIS & REPORTING
+ * - Best solution identification
+ * - Performance statistics
+ * - Delivery sequence optimization results
+ */
 public class Main {
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Choose the Chromosome type");
-        System.out.println("1-Binary \n2-Integer\n3-Floating Point");
-        int choice, noOfOrders, popSize, timeConstraint;
+        Random rand = new Random();
 
-        choice = sc.nextInt();
+        System.out.println("================================================================");
+        System.out.println("    GENETIC ALGORITHM FOR ORDER DELIVERY OPTIMIZATION");
+        System.out.println("================================================================");
+        System.out.println("This program implements a comprehensive GA with 8 phases:");
+        System.out.println("1. Problem Setup & Parameter Configuration");
+        System.out.println("2. Chromosome Representation & Initialization");
+        System.out.println("3. Fitness Evaluation");
+        System.out.println("4. Selection Operators");
+        System.out.println("5. Crossover Operators");
+        System.out.println("6. Mutation Operators");
+        System.out.println("7. Evolutionary Loop");
+        System.out.println("8. Results Analysis & Reporting");
+        System.out.println("================================================================");
 
-        System.out.println("Please enter the number of orders");
-        noOfOrders = sc.nextInt();
+        // ========================================
+        // PHASE 1: PROBLEM SETUP & PARAMETER CONFIGURATION
+        // ========================================
+        System.out.println("\n=== PHASE 1: PROBLEM SETUP & PARAMETER CONFIGURATION ===");
+        
+        System.out.println("Choose Chromosome Type:");
+        System.out.println("1 - Binary (Matrix representation)");
+        System.out.println("2 - Integer (Direct sequence)");
+        System.out.println("3 - Floating Point (Continuous values)");
+        int type = sc.nextInt();
 
-        System.out.println("Please enter the population size");
-        popSize = sc.nextInt();
+        System.out.println("Enter number of delivery points (excluding depot):");
+        int numOrders = sc.nextInt();
 
-        System.out.println("Please enter the time constraint");
-        timeConstraint = sc.nextInt();
+        System.out.println("Enter population size:");
+        int popSize = sc.nextInt();
 
-        // Generate distance matrix (n+1 for depot + orders)
-        ArrayList<ArrayList<Integer>> distMatrix = getDistanceBetweenAllPoints(noOfOrders + 1);
-
-        System.out.println("\n=== Distance Matrix ===");
-        printDistanceMatrix(distMatrix);
-
-        // Initialize population
-        Initializer initializer = new Initializer();
-        List<Chromosome> population = initializer.init(choice, noOfOrders, popSize);
-
-        System.out.println("\n=== Initial Population ===");
-
-        // For binary chromosomes, evaluate fitness
-        if (choice == 1) {
-            BinaryFitnessEvaluator evaluator = new BinaryFitnessEvaluator(distMatrix, timeConstraint);
-
-            for (int i = 0; i < population.size(); i++) {
-                BinaryChromosome chromosome = (BinaryChromosome) population.get(i);
-
-                // Calculate fitness
-                Integer fitness = evaluator.evaluate(chromosome);
-                chromosome.setFitness(fitness);
-
-                // Calculate total route time
-                int totalTime = evaluator.calculateTotalRouteTime(chromosome);
-
-                System.out.println("\nChromosome " + (i + 1) + ":");
-                System.out.println(chromosome);
-                System.out.println("  Total route time: " + totalTime + " (constraint: " + timeConstraint + ")");
-                System.out.println("  Orders deliverable within time: " + fitness + "/" + noOfOrders);
-            }
-
-            // Find best chromosome
-            BinaryChromosome best = (BinaryChromosome) population.get(0);
-            int bestTime = evaluator.calculateTotalRouteTime(best);
-
-            for (Chromosome c : population) {
-                BinaryChromosome bc = (BinaryChromosome) c;
-                int bcTime = evaluator.calculateTotalRouteTime(bc);
-
-                // Better if: higher fitness OR (same fitness but shorter time)
-                if (bc.getFitness() > best.getFitness() ||
-                        (bc.getFitness() == best.getFitness() && bcTime < bestTime)) {
-                    best = bc;
-                    bestTime = bcTime;
-                }
-            }
-
-            System.out.println("\n=== Best Initial Solution ===");
-            System.out.println("Fitness: " + best.getFitness() + " orders");
-            System.out.println("Total time: " + bestTime);
-            System.out.println("Delivery sequence: " + best.getDeliverySequence());
-
-            // Run Genetic Algorithm
-            System.out.println("\n=== Run Genetic Algorithm? ===");
-            System.out.println("1 - Yes");
-            System.out.println("2 - No (just testing)");
-            int runGA = sc.nextInt();
-
-            if (runGA == 1) {
-                runGeneticAlgorithm(population, evaluator, sc);
-            } else {
-                // Test Selection Methods
-                System.out.println("\n=== Test Selection Methods? ===");
-                System.out.println("1 - Yes, test Tournament Selection");
-                System.out.println("2 - Yes, test Roulette Wheel Selection");
-                System.out.println("3 - No, skip");
-                int selectionChoice = sc.nextInt();
-
-                if (selectionChoice == 1 || selectionChoice == 2) {
-                    int numSelections = 10;
-                    System.out.println("How many selections to perform? (default 10)");
-                    numSelections = sc.nextInt();
-
-                    if (selectionChoice == 1) {
-                        System.out.println("Please enter tournament size");
-                        int tournamentSize = sc.nextInt();
-                        TournamentSelection selection = new TournamentSelection(tournamentSize, evaluator);
-                        testSelectionMethod(selection, population, evaluator,
-                                "Tournament (size=" + tournamentSize + ")", numSelections);
-                    } else {
-                        RouletteWheelSelection selection = new RouletteWheelSelection(evaluator);
-                        testSelectionMethod(selection, population, evaluator,
-                                "Roulette Wheel", numSelections);
-                    }
-                }
-
-                // Test Mutation
-                System.out.println("\n=== Test Mutation? ===");
-                System.out.println("1 - Yes, test Swap Mutation");
-                System.out.println("2 - No, skip");
-                int mutationChoice = sc.nextInt();
-
-                if (mutationChoice == 1) {
-                    System.out.println("Enter mutation probability (0.0 to 1.0, e.g., 0.3)");
-                    double mutationProb = sc.nextDouble();
-
-                    System.out.println("How many chromosomes to mutate? (default 5)");
-                    int numToMutate = sc.nextInt();
-
-                    testMutation(population, evaluator, mutationProb, numToMutate);
-                }
-            }
-
-        } else {
-            // Display other chromosome types
-            for (int i = 0; i < population.size(); i++) {
-                System.out.println("\nChromosome " + (i + 1) + ":");
-                System.out.println(population.get(i));
-            }
-        }
-
-        sc.close();
-    }
-
-    private static void runGeneticAlgorithm(List<Chromosome> population,
-                                            BinaryFitnessEvaluator evaluator,
-                                            Scanner sc) {
-        System.out.println("\n=== Genetic Algorithm Configuration ===");
-
-        System.out.println("Number of generations:");
+        System.out.println("Enter number of generations:");
         int generations = sc.nextInt();
 
-        System.out.println("Selection method (1-Tournament, 2-Roulette):");
-        int selectionType = sc.nextInt();
-
-        int tournamentSize = 3;
-        if (selectionType == 1) {
-            System.out.println("Tournament size:");
-            tournamentSize = sc.nextInt();
-        }
-
-        System.out.println("Crossover probability (0.0-1.0, e.g., 0.8):");
+        System.out.println("Enter crossover probability (0.0 - 1.0):");
         double crossoverProb = sc.nextDouble();
 
-        System.out.println("Mutation probability (0.0-1.0, e.g., 0.1):");
+        System.out.println("Enter mutation probability (0.0 - 1.0):");
         double mutationProb = sc.nextDouble();
 
-        // Create operators
-        Selection selection = selectionType == 1
-                ? new TournamentSelection(tournamentSize, evaluator)
-                : new RouletteWheelSelection(evaluator);
+        System.out.println("Enter time constraint (total delivery time limit):");
+        int timeConstraint = sc.nextInt();
 
-        Crossover crossover = new OrderOneCrossover();
+        // Generate distance matrix
+        int n = numOrders + 1; // +1 for depot
+        ArrayList<ArrayList<Integer>> distanceMatrix = getDistanceBetweenAllPoints(n);
+        printDistanceMatrix(distanceMatrix);
 
-        // Track best solution
-        BinaryChromosome bestOverall = (BinaryChromosome) population.get(0);
-        int bestOverallTime = evaluator.calculateTotalRouteTime(bestOverall);
+        // ========================================
+        // PHASE 2: CHROMOSOME REPRESENTATION & INITIALIZATION
+        // ========================================
+        System.out.println("\n=== PHASE 2: CHROMOSOME REPRESENTATION & INITIALIZATION ===");
+        
+        // Initialize fitness evaluator based on chromosome type
+        FitnessEvaluator evaluator;
+        if (type == 1) {
+            BinaryFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+            evaluator = BinaryFitnessEvaluator.getInstance();
+            System.out.println("Using Binary Chromosome representation with matrix encoding");
+        } else if (type == 2) {
+            IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+            evaluator = IntegerFitnessEvaluator.getInstance();
+            System.out.println("Using Integer Chromosome representation with direct sequence");
+        } else {
+            // For floating point, we'll use integer evaluator as fallback
+            IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+            evaluator = IntegerFitnessEvaluator.getInstance();
+            System.out.println("Using Floating Point Chromosome representation");
+        }
 
-        System.out.println("\n=== Starting Evolution ===\n");
+        // Use Initializer class for population creation
+        Initializer initializer = new Initializer();
+        List<Chromosome> population = initializer.init(type, numOrders, popSize);
+        System.out.println("Population initialized with " + population.size() + " individuals");
+
+        // ========================================
+        // PHASE 3: FITNESS EVALUATION
+        // ========================================
+        System.out.println("\n=== PHASE 3: FITNESS EVALUATION ===");
+        
+        // Evaluate initial population fitness
+        for (Chromosome chromosome : population) {
+            chromosome.getFitness(); // This triggers fitness evaluation
+        }
+        
+        Chromosome initialBest = findBest(population, evaluator);
+        System.out.println("Initial best fitness: " + initialBest.getFitness());
+        System.out.println("Initial best sequence: " + initialBest.getDeliverySequence());
+
+        // ========================================
+        // PHASE 4: SELECTION OPERATORS
+        // ========================================
+        System.out.println("\n=== PHASE 4: SELECTION OPERATORS ===");
+        
+        Crossover crossover;
+        if (type == 1) {
+            crossover = new OrderOneCrossover();
+            System.out.println("Using OrderOneCrossover for binary chromosomes");
+        } else {
+            crossover = IntegerCrossover.getInstance();
+            System.out.println("Using IntegerCrossover for integer chromosomes");
+        }
+
+        System.out.println("Choose Selection Method:");
+        System.out.println("1 - Tournament Selection");
+        System.out.println("2 - Roulette Wheel Selection");
+        int selType = sc.nextInt();
+
+        Selection selection;
+        if (selType == 1) {
+            System.out.println("Enter tournament size:");
+            int tSize = sc.nextInt();
+            selection = new TournamentSelection(tSize, (BinaryFitnessEvaluator) evaluator);
+            System.out.println("Using Tournament Selection with size: " + tSize);
+        } else {
+            selection = new RouletteWheelSelection((BinaryFitnessEvaluator) evaluator);
+            System.out.println("Using Roulette Wheel Selection");
+        }
+
+        // ========================================
+        // PHASE 5: CROSSOVER OPERATORS DEMONSTRATION
+        // ========================================
+        System.out.println("\n=== PHASE 5: CROSSOVER OPERATORS DEMONSTRATION ===");
+        System.out.println("Crossover probability: " + crossoverProb);
+        
+        // Demonstrate crossover with sample parents
+        Chromosome demoParent1 = population.get(0).clone();
+        Chromosome demoParent2 = population.get(1).clone();
+        
+        System.out.println("\n--- CROSSOVER DEMONSTRATION ---");
+        System.out.println("Parent 1: " + demoParent1.getDeliverySequence() + " (Fitness: " + demoParent1.getFitness() + ")");
+        System.out.println("Parent 2: " + demoParent2.getDeliverySequence() + " (Fitness: " + demoParent2.getFitness() + ")");
+        
+        List<Chromosome> crossoverResult = crossover.crossover(demoParent1, demoParent2, crossoverProb);
+        System.out.println("Crossover Result:");
+        for (int i = 0; i < crossoverResult.size(); i++) {
+            System.out.println("  Child " + (i+1) + ": " + crossoverResult.get(i).getDeliverySequence() + 
+                             " (Fitness: " + crossoverResult.get(i).getFitness() + ")");
+        }
+
+        // ========================================
+        // PHASE 6: MUTATION OPERATORS DEMONSTRATION
+        // ========================================
+        System.out.println("\n=== PHASE 6: MUTATION OPERATORS DEMONSTRATION ===");
+        System.out.println("Mutation probability: " + mutationProb);
+        
+        // Demonstrate mutation with sample chromosome
+        Chromosome demoChromosome = population.get(2).clone();
+        System.out.println("\n--- MUTATION DEMONSTRATION ---");
+        System.out.println("Before Mutation: " + demoChromosome.getDeliverySequence() + " (Fitness: " + demoChromosome.getFitness() + ")");
+        
+        demoChromosome.mutateMethod1(mutationProb);
+        System.out.println("After Mutation: " + demoChromosome.getDeliverySequence() + " (Fitness: " + demoChromosome.getFitness() + ")");
+        
+        // Demonstrate selection
+        System.out.println("\n--- SELECTION DEMONSTRATION ---");
+        System.out.println("Population sample for selection:");
+        for (int i = 0; i < Math.min(5, population.size()); i++) {
+            System.out.println("  Individual " + (i+1) + ": " + population.get(i).getDeliverySequence() + 
+                             " (Fitness: " + population.get(i).getFitness() + ")");
+        }
+        
+        Chromosome selectedParent1 = selection.select(population);
+        Chromosome selectedParent2 = selection.select(population);
+        System.out.println("Selected Parent 1: " + selectedParent1.getDeliverySequence() + " (Fitness: " + selectedParent1.getFitness() + ")");
+        System.out.println("Selected Parent 2: " + selectedParent2.getDeliverySequence() + " (Fitness: " + selectedParent2.getFitness() + ")");
+
+        // ========================================
+        // PHASE 7: EVOLUTIONARY LOOP
+        // ========================================
+        System.out.println("\n=== PHASE 7: EVOLUTIONARY LOOP ===");
+        
+        Chromosome bestOverall = initialBest.clone();
+        List<Double> fitnessHistory = new ArrayList<>();
+        List<Integer> generationStats = new ArrayList<>();
 
         for (int gen = 0; gen < generations; gen++) {
             List<Chromosome> newPopulation = new ArrayList<>();
 
-            // Elitism: keep best chromosome
-            BinaryChromosome best = findBest(population, evaluator);
-            newPopulation.add(best.copy());
+            // Elite preservation - keep best individual
+            Chromosome best = findBest(population, evaluator);
+            newPopulation.add(best.clone());
 
-            // Generate rest of population
-            while (newPopulation.size() < population.size()) {
-                // Selection
+            // Show detailed operations for first few generations
+            boolean showDetails = (gen < 3) || (gen + 1) % 10 == 0 || gen == generations - 1;
+            
+            if (showDetails) {
+                System.out.println("\n--- GENERATION " + (gen + 1) + " OPERATIONS ---");
+                System.out.println("Elite preserved: " + best.getDeliverySequence() + " (Fitness: " + best.getFitness() + ")");
+            }
+
+            int operationCount = 0;
+            // Create new population through selection, crossover, and mutation
+            while (newPopulation.size() < popSize) {
+                // Selection phase
                 Chromosome parent1 = selection.select(population);
                 Chromosome parent2 = selection.select(population);
 
-                // Crossover
-                List<Chromosome> offspring = crossover.crossover(parent1, parent2, crossoverProb);
+                if (showDetails && operationCount < 3) {
+                    System.out.println("Operation " + (operationCount + 1) + ":");
+                    System.out.println("  Selected Parent 1: " + parent1.getDeliverySequence() + " (Fitness: " + parent1.getFitness() + ")");
+                    System.out.println("  Selected Parent 2: " + parent2.getDeliverySequence() + " (Fitness: " + parent2.getFitness() + ")");
+                }
 
-                // Mutation
-                for (Chromosome child : offspring) {
-                    child.mutate(mutationProb);
-
-                    // Evaluate fitness
-                    BinaryChromosome bc = (BinaryChromosome) child;
-                    int fitness = evaluator.evaluate(bc);
-                    bc.setFitness(fitness);
-
-                    if (newPopulation.size() < population.size()) {
-                        newPopulation.add(child);
+                // Crossover phase
+                List<Chromosome> children = crossover.crossover(parent1, parent2, crossoverProb);
+                
+                if (showDetails && operationCount < 3) {
+                    System.out.println("  Crossover Result:");
+                    for (int i = 0; i < children.size(); i++) {
+                        System.out.println("    Child " + (i+1) + " (before mutation): " + children.get(i).getDeliverySequence());
                     }
+                }
+                
+                // Mutation phase
+                for (Chromosome child : children) {
+                    if (showDetails && operationCount < 3) {
+                        System.out.println("    Before Mutation: " + child.getDeliverySequence());
+                    }
+                    child.mutateMethod1(mutationProb);
+                    if (showDetails && operationCount < 3) {
+                        System.out.println("    After Mutation: " + child.getDeliverySequence() + " (Fitness: " + child.getFitness() + ")");
+                    }
+                    newPopulation.add(child);
+                    if (newPopulation.size() >= popSize) break;
+                }
+                
+                operationCount++;
+                if (showDetails && operationCount >= 3) {
+                    System.out.println("  ... (showing first 3 operations, continuing with " + (popSize - newPopulation.size()) + " more operations)");
+                    showDetails = false; // Stop showing details for this generation
                 }
             }
 
-            // Update population
             population = newPopulation;
 
-            // Find best in current generation
-            BinaryChromosome currentBest = findBest(population, evaluator);
-            int currentBestTime = evaluator.calculateTotalRouteTime(currentBest);
-
-            // Update overall best
-            if (currentBest.getFitness() > bestOverall.getFitness() ||
-                    (currentBest.getFitness() == bestOverall.getFitness() && currentBestTime < bestOverallTime)) {
-                bestOverall = (BinaryChromosome) currentBest.copy();
-                bestOverallTime = currentBestTime;
+            // Track best solution
+            Chromosome currentBest = findBest(population, evaluator);
+            if (currentBest.getFitness() > bestOverall.getFitness()) {
+                bestOverall = currentBest.clone();
             }
 
-            // Print progress every 10 generations
+            // Record statistics
+            fitnessHistory.add((double) currentBest.getFitness());
+            generationStats.add(gen + 1);
+
+            // Progress reporting
             if ((gen + 1) % 10 == 0 || gen == 0 || gen == generations - 1) {
-                System.out.println("Generation " + (gen + 1) + ": Best Fitness=" +
-                        currentBest.getFitness() + ", Time=" + currentBestTime +
-                        ", Sequence=" + currentBest.getDeliverySequence());
+                System.out.println("\nGeneration " + (gen + 1) + " Summary:");
+                System.out.println("  Best Fitness: " + currentBest.getFitness());
+                System.out.println("  Best Sequence: " + currentBest.getDeliverySequence());
+                System.out.println("  Population Average Fitness: " + String.format("%.2f", 
+                    population.stream().mapToInt(Chromosome::getFitness).average().orElse(0.0)));
             }
         }
 
-        System.out.println("\n=== Final Best Solution ===");
-        System.out.println("Fitness: " + bestOverall.getFitness() + " orders");
-        System.out.println("Total time: " + bestOverallTime);
-        System.out.println("Delivery sequence: " + bestOverall.getDeliverySequence());
+        // ========================================
+        // PHASE 8: RESULTS ANALYSIS & REPORTING
+        // ========================================
+        System.out.println("\n=== PHASE 8: RESULTS ANALYSIS & REPORTING ===");
+        
+        System.out.println("\n================================================================");
+        System.out.println("                    FINAL RESULTS");
+        System.out.println("================================================================");
+        System.out.println("Best Fitness Achieved: " + bestOverall.getFitness());
+        System.out.println("Best Delivery Sequence: " + bestOverall.getDeliverySequence());
+        System.out.println("Total Route Time: " + bestOverall.getTotalRouteTime());
+        System.out.println("Time Constraint: " + timeConstraint);
+        
+        // Performance statistics
+        double avgFitness = fitnessHistory.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double maxFitness = fitnessHistory.stream().mapToDouble(Double::doubleValue).max().orElse(0.0);
+        double minFitness = fitnessHistory.stream().mapToDouble(Double::doubleValue).min().orElse(0.0);
+        
+        System.out.println("\n=== PERFORMANCE STATISTICS ===");
+        System.out.println("Average Fitness: " + String.format("%.2f", avgFitness));
+        System.out.println("Maximum Fitness: " + String.format("%.2f", maxFitness));
+        System.out.println("Minimum Fitness: " + String.format("%.2f", minFitness));
+        System.out.println("Fitness Improvement: " + (bestOverall.getFitness() - initialBest.getFitness()));
+        
+        System.out.println("\n=== ALGORITHM CONFIGURATION USED ===");
+        System.out.println("Chromosome Type: " + (type == 1 ? "Binary" : type == 2 ? "Integer" : "Floating Point"));
+        System.out.println("Population Size: " + popSize);
+        System.out.println("Generations: " + generations);
+        System.out.println("Crossover Probability: " + crossoverProb);
+        System.out.println("Mutation Probability: " + mutationProb);
+        System.out.println("Selection Method: " + (selType == 1 ? "Tournament" : "Roulette Wheel"));
+        
+        // Final algorithm demonstration
+        System.out.println("\n=== FINAL ALGORITHM DEMONSTRATION ===");
+        System.out.println("Demonstrating the complete genetic algorithm workflow:");
+        
+        // Show final population sample
+        System.out.println("\nFinal Population Sample (top 5 individuals):");
+        List<Chromosome> sortedPopulation = new ArrayList<>(population);
+        sortedPopulation.sort((a, b) -> Integer.compare(b.getFitness(), a.getFitness()));
+        
+        for (int i = 0; i < Math.min(5, sortedPopulation.size()); i++) {
+            Chromosome c = sortedPopulation.get(i);
+            System.out.println("  Rank " + (i+1) + ": " + c.getDeliverySequence() + 
+                             " (Fitness: " + c.getFitness() + ", Route Time: " + c.getTotalRouteTime() + ")");
+        }
+        
+        // Show algorithm effectiveness
+        System.out.println("\nAlgorithm Effectiveness Analysis:");
+        System.out.println("  Initial Best Fitness: " + initialBest.getFitness());
+        System.out.println("  Final Best Fitness: " + bestOverall.getFitness());
+        System.out.println("  Improvement: " + (bestOverall.getFitness() - initialBest.getFitness()) + 
+                         " (" + String.format("%.1f", ((double)(bestOverall.getFitness() - initialBest.getFitness()) / initialBest.getFitness() * 100)) + "% improvement)");
+        
+        // Show convergence analysis
+        if (fitnessHistory.size() > 1) {
+            double convergenceRate = (fitnessHistory.get(fitnessHistory.size()-1) - fitnessHistory.get(0)) / fitnessHistory.size();
+            System.out.println("  Average Fitness Improvement per Generation: " + String.format("%.2f", convergenceRate));
+        }
+        
+        System.out.println("\n================================================================");
+        System.out.println("    GENETIC ALGORITHM EXECUTION COMPLETED SUCCESSFULLY");
+        System.out.println("    All 8 phases demonstrated with detailed results");
+        System.out.println("================================================================");
+
+        sc.close();
     }
 
-    private static BinaryChromosome findBest(List<Chromosome> population, BinaryFitnessEvaluator evaluator) {
-        BinaryChromosome best = (BinaryChromosome) population.get(0);
-        int bestTime = evaluator.calculateTotalRouteTime(best);
 
+    public static Chromosome findBest(List<Chromosome> population, FitnessEvaluator evaluator) {
+        Chromosome best = population.get(0);
         for (Chromosome c : population) {
-            BinaryChromosome bc = (BinaryChromosome) c;
-            int bcTime = evaluator.calculateTotalRouteTime(bc);
-
-            if (bc.getFitness() > best.getFitness() ||
-                    (bc.getFitness() == best.getFitness() && bcTime < bestTime)) {
-                best = bc;
-                bestTime = bcTime;
+            if (c.getFitness() > best.getFitness()) {
+                best = c;
             }
         }
-
         return best;
-    }
-
-    private static void testSelectionMethod(Selection selection,
-                                            List<Chromosome> population,
-                                            BinaryFitnessEvaluator evaluator,
-                                            String methodName,
-                                            int numSelections) {
-        System.out.println("\n=== Testing Selection ===");
-        System.out.println("Method: " + methodName);
-
-        Map<String, Integer> selectionCount = new HashMap<>();
-
-        for (int i = 0; i < numSelections; i++) {
-            Chromosome selected = selection.select(population);
-            BinaryChromosome bc = (BinaryChromosome) selected;
-            String key = bc.getDeliverySequence().toString();
-            selectionCount.put(key, selectionCount.getOrDefault(key, 0) + 1);
-
-            System.out.println("Selection " + (i + 1) + ": Fitness=" + bc.getFitness() +
-                    ", Time=" + evaluator.calculateTotalRouteTime(bc) +
-                    ", Sequence=" + bc.getDeliverySequence());
-        }
-
-        System.out.println("\n=== Selection Frequency ===");
-        selectionCount.forEach((seq, count) ->
-                System.out.println(seq + " selected " + count + " times")
-        );
-    }
-
-    private static void testMutation(List<Chromosome> population,
-                                     BinaryFitnessEvaluator evaluator,
-                                     double mutationProb,
-                                     int numToMutate) {
-        System.out.println("\n=== Testing Mutation ===");
-        System.out.println("Mutation probability: " + mutationProb);
-        System.out.println("Number of chromosomes to test: " + numToMutate);
-
-        int mutationCount = 0;
-
-        for (int i = 0; i < numToMutate && i < population.size(); i++) {
-            BinaryChromosome original = (BinaryChromosome) population.get(i);
-            BinaryChromosome mutated = original.clone();
-
-            System.out.println("\n--- Chromosome " + (i + 1) + " ---");
-            System.out.println("Before: " + original.getDeliverySequence() +
-                    " (Fitness=" + original.getFitness() +
-                    ", Time=" + evaluator.calculateTotalRouteTime(original) + ")");
-
-            mutated.mutate(mutationProb);
-
-            // Re-evaluate fitness after mutation
-            int newFitness = evaluator.evaluate(mutated);
-            mutated.setFitness(newFitness);
-
-            System.out.println("After:  " + mutated.getDeliverySequence() +
-                    " (Fitness=" + mutated.getFitness() +
-                    ", Time=" + evaluator.calculateTotalRouteTime(mutated) + ")");
-
-            if (!original.getDeliverySequence().equals(mutated.getDeliverySequence())) {
-                System.out.println("✅ Mutation occurred");
-                mutationCount++;
-            } else {
-                System.out.println("❌ No mutation (probability based)");
-            }
-        }
-
-        System.out.println("\n=== Mutation Summary ===");
-        System.out.println("Mutations occurred: " + mutationCount + "/" + numToMutate);
-        System.out.println("Actual rate: " + (mutationCount * 100.0 / numToMutate) + "%");
     }
 
     public static ArrayList<ArrayList<Integer>> getDistanceBetweenAllPoints(int n) {
@@ -342,14 +415,8 @@ public class Main {
     }
 
     public static void printDistanceMatrix(ArrayList<ArrayList<Integer>> matrix) {
-        System.out.print("     ");
+        System.out.println("\n=== Distance Matrix ===");
         for (int i = 0; i < matrix.size(); i++) {
-            System.out.printf("%4d", i);
-        }
-        System.out.println();
-
-        for (int i = 0; i < matrix.size(); i++) {
-            System.out.printf("%4d:", i);
             for (int j = 0; j < matrix.get(i).size(); j++) {
                 System.out.printf("%4d", matrix.get(i).get(j));
             }

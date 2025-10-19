@@ -17,14 +17,10 @@ public class OrderOneCrossover implements Crossover {
         if (!(parent1 instanceof BinaryChromosome) || !(parent2 instanceof BinaryChromosome)) {
             throw new IllegalArgumentException("OrderOneCrossover only works with BinaryChromosome");
         }
-
         List<Chromosome> offspring = new ArrayList<>();
-
-        // Check if crossover should occur based on probability
         if (random.nextDouble() > probability) {
-            // No crossover - return copies of parents
-            offspring.add(parent1.copy());
-            offspring.add(parent2.copy());
+            offspring.add(parent1.clone());
+            offspring.add(parent2.clone());
             return offspring;
         }
 
@@ -37,18 +33,11 @@ public class OrderOneCrossover implements Crossover {
         if (seq1.size() != seq2.size() || seq1.size() < 2) {
             throw new IllegalArgumentException("Parents must have same size and at least 2 orders");
         }
-
         int size = seq1.size();
-
-        // Step 1: Choose two random cut points
         int cutPoint1 = random.nextInt(size - 1);
         int cutPoint2 = random.nextInt(size - cutPoint1 - 1) + cutPoint1 + 1;
-
-        // Step 2 & 3: Create offspring
         List<Integer> child1Seq = createOffspring(seq1, seq2, cutPoint1, cutPoint2);
         List<Integer> child2Seq = createOffspring(seq2, seq1, cutPoint1, cutPoint2);
-
-        // Convert sequences back to BinaryChromosome
         BinaryChromosome child1 = sequenceToChromosome(child1Seq);
         BinaryChromosome child2 = sequenceToChromosome(child2Seq);
 
@@ -58,28 +47,21 @@ public class OrderOneCrossover implements Crossover {
         return offspring;
     }
 
-    /**
-     * Create offspring using OX1 algorithm
-     */
     private List<Integer> createOffspring(List<Integer> parent1, List<Integer> parent2,
                                           int cutPoint1, int cutPoint2) {
         int size = parent1.size();
         List<Integer> offspring = new ArrayList<>();
 
-        // Initialize with -1 (empty)
         for (int i = 0; i < size; i++) {
             offspring.add(-1);
         }
 
-        // Step 2: Copy substring from parent1
         Set<Integer> used = new HashSet<>();
         for (int i = cutPoint1; i <= cutPoint2; i++) {
             offspring.set(i, parent1.get(i));
             used.add(parent1.get(i));
         }
 
-        // Step 3: Fill remaining positions from parent2
-        // Start from position after cutPoint2, wrapping around
         int currentPos = (cutPoint2 + 1) % size;
         int parent2Pos = (cutPoint2 + 1) % size;
 
@@ -98,14 +80,10 @@ public class OrderOneCrossover implements Crossover {
         return offspring;
     }
 
-    /**
-     * Convert delivery sequence to BinaryChromosome (2D array)
-     */
     private BinaryChromosome sequenceToChromosome(List<Integer> sequence) {
         int size = sequence.size();
         BinaryChromosome chromosome = new BinaryChromosome();
 
-        // Initialize 2D array with all false
         List<List<Boolean>> genes = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             List<Boolean> row = new ArrayList<>();
@@ -115,7 +93,6 @@ public class OrderOneCrossover implements Crossover {
             genes.add(row);
         }
 
-        // Set the genes according to sequence
         for (int position = 0; position < size; position++) {
             int order = sequence.get(position);
             genes.get(order).set(position, true);

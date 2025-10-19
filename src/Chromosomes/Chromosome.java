@@ -1,7 +1,13 @@
 package Chromosomes;
 
+import java.util.List;
+
 public interface Chromosome {
-    void mutate(double probability);
     void generateGenes(int numberOfGenes);
-    Chromosome copy();
+    List<Integer> getDeliverySequence();
+    void mutateMethod1(double probability);
+    void mutateMethod2(double probability);
+    int getFitness();
+    Chromosome clone();
+    int getTotalRouteTime();
 }

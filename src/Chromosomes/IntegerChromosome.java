@@ -1,27 +1,90 @@
 package Chromosomes;
 
+import Fitness.IntegerFitnessEvaluator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class IntegerChromosome implements Chromosome{
-    List<Integer> Genes;
-    @Override
-    public void mutate(double probability) {
+public class IntegerChromosome implements Chromosome {
+    private List<Integer> genes;
+    private static final Random rand = new Random();
+    private IntegerFitnessEvaluator fitnessEvaluator = IntegerFitnessEvaluator.getInstance();
 
+    public IntegerChromosome(List<Integer> genes) {
+        this.genes = new ArrayList<>(genes);
     }
-    Random rand = new Random();
+
+    public IntegerChromosome() {
+        this.genes = new ArrayList<>();
+    }
+
+    public IntegerChromosome(IntegerChromosome other) {
+        this.genes = new ArrayList<>(other.genes); // deep copy
+        this.fitnessEvaluator = IntegerFitnessEvaluator.getInstance();
+    }
 
     @Override
     public void generateGenes(int numberOfGenes) {
-        Genes = new ArrayList<Integer>();
+        genes = new ArrayList<>();
         for (int i = 0; i < numberOfGenes; i++) {
-            Genes.add(Integer.valueOf(rand.nextInt(100)));
+            genes.add(i + 1);
+        }
+
+        for (int i = 0; i < genes.size(); i++) {
+            int first = rand.nextInt(genes.size());
+            int second = rand.nextInt(genes.size());
+            Collections.swap(genes, first, second);
         }
     }
 
     @Override
-    public Chromosome copy() {
-        return null;
+    public List<Integer> getDeliverySequence() {
+        return genes;
     }
+
+    @Override
+    public void mutateMethod1(double probability) {
+        for (int i = 0; i < genes.size(); i++) {
+            mutateBySwapping(i, probability);
+        }
+    }
+
+    @Override
+    public void mutateMethod2(double probability) {
+        for (int i = 0; i < genes.size(); i++) {
+            mutateByBecomingLast(i, probability);
+        }
+    }
+
+    @Override
+    public int getFitness() {
+        return fitnessEvaluator.evaluate(this);
+    }
+
+    @Override
+    public Chromosome clone() {
+        return new IntegerChromosome(this);
+    }
+
+    @Override
+    public int getTotalRouteTime() {
+        return 0;
+    }
+
+    public void mutateBySwapping(int idx, double probability) {
+        if (rand.nextDouble() < probability && genes.size() > 1) {
+            int second = rand.nextInt(genes.size());
+            Collections.swap(genes, idx, second);
+        }
+    }
+
+    public void mutateByBecomingLast(int idx, double probability) {
+        if (rand.nextDouble() < probability && !genes.isEmpty()) {
+            int val = genes.get(idx);
+            genes.remove(idx);
+            genes.add(val);
+        }
+    }
+
 }

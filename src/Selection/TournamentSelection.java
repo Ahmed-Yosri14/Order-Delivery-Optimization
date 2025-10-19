@@ -57,7 +57,7 @@ public class TournamentSelection implements Selection {
 
             // Place n copies of this individual in the mating pool
             for (int j = 0; j < tournamentSize && matingPool.size() < targetSize; j++) {
-                matingPool.add(winner.copy());
+                matingPool.add(winner.clone());
             }
         }
 
