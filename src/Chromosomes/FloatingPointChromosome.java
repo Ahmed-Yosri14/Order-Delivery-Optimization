@@ -14,6 +14,9 @@ public class FloatingPointChromosome implements Chromosome {
     public FloatingPointChromosome(List<Double> genes) {
         this.genes = new ArrayList<>(genes);
     }
+    public FloatingPointChromosome(){
+
+    }
     @Override
     public void mutateMethod1(double probability) {
 
