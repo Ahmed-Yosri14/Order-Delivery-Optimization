@@ -2,7 +2,6 @@ import Chromosomes.*;
 import Crossover.*;
 import Fitness.*;
 import Selection.*;
-import Replacement.*;
 
 import java.util.*;
 
@@ -13,7 +12,6 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Random rand = new Random();
 
         System.out.println("================================================================");
         System.out.println("    GENETIC ALGORITHM FOR ORDER DELIVERY OPTIMIZATION");
@@ -52,19 +50,17 @@ public class Main {
 
         System.out.println("\n=== INITIALIZATION ===");
         
-        // Initialize fitness evaluator based on chromosome type
-        FitnessEvaluator evaluator;
+        // Initialize all fitness evaluators with the same problem parameters
+        BinaryFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+        IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+        FloatingPointFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+        
+        // Display chromosome type information
         if (type == 1) {
-            BinaryFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
-            evaluator = BinaryFitnessEvaluator.getInstance();
             System.out.println("Using Binary Chromosome representation with matrix encoding");
         } else if (type == 2) {
-            IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
-            evaluator = IntegerFitnessEvaluator.getInstance();
             System.out.println("Using Integer Chromosome representation with direct sequence");
         } else {
-            FloatingPointFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
-            evaluator = FloatingPointFitnessEvaluator.getInstance();
             System.out.println("Using Floating Point Chromosome representation");
         }
 
@@ -80,7 +76,7 @@ public class Main {
             chromosome.getFitness(); // This triggers fitness evaluation
         }
         
-        Chromosome initialBest = findBest(population, evaluator);
+        Chromosome initialBest = findBest(population);
         System.out.println("Initial best fitness: " + initialBest.getFitness());
         System.out.println("Initial best sequence: " + initialBest.getDeliverySequence());
 
@@ -104,9 +100,9 @@ public class Main {
         if (selType == 1) {
             System.out.println("Enter tournament size:");
             int tSize = sc.nextInt();
-            selection = new TournamentSelection(tSize, (BinaryFitnessEvaluator) evaluator);
+            selection = new TournamentSelection(tSize);
         } else {
-            selection = new RouletteWheelSelection((BinaryFitnessEvaluator) evaluator);
+            selection = new RouletteWheelSelection();
         }
         
         // Replacement Strategy
@@ -116,22 +112,18 @@ public class Main {
         System.out.println("3 - Elitist (Keep best individuals)");
         int replaceChoice = sc.nextInt();
         
-        ReplacementStrategy replacementStrategy;
-        int offspringNeeded;
-        
+        // Note: Replacement strategies are available but not used in the current implementation
+        // The main loop uses elite preservation instead
         if (replaceChoice == 1) {
-            replacementStrategy = new GenerationalReplacement();
-            offspringNeeded = popSize;
+            System.out.println("Generational replacement selected (using elite preservation)");
         } else if (replaceChoice == 2) {
             System.out.println("Enter K (number of parents to replace):");
-            int k = sc.nextInt();
-            replacementStrategy = new SteadyStateReplacement(k);
-            offspringNeeded = k;
+            sc.nextInt(); // consume input
+            System.out.println("Steady-state replacement selected (using elite preservation)");
         } else {
             System.out.println("Enter number of elite individuals:");
-            int eliteCount = sc.nextInt();
-            replacementStrategy = new ElitistReplacement(eliteCount);
-            offspringNeeded = popSize - eliteCount;
+            sc.nextInt(); // consume input
+            System.out.println("Elitist replacement selected (using elite preservation)");
         }
 
         // ========================================
@@ -195,7 +187,7 @@ public class Main {
             List<Chromosome> newPopulation = new ArrayList<>();
 
             // Elite preservation - keep best individual
-            Chromosome best = findBest(population, evaluator);
+            Chromosome best = findBest(population);
             newPopulation.add(best.clone());
 
             // Show detailed operations for first few generations
@@ -252,7 +244,7 @@ public class Main {
             population = newPopulation;
 
             // Track best solution
-            Chromosome currentBest = findBest(population, evaluator);
+            Chromosome currentBest = findBest(population);
             if (currentBest.getFitness() > bestOverall.getFitness()) {
                 bestOverall = currentBest.clone();
             }
@@ -340,7 +332,7 @@ public class Main {
     }
 
 
-    public static Chromosome findBest(List<Chromosome> population, FitnessEvaluator evaluator) {
+    public static Chromosome findBest(List<Chromosome> population) {
         Chromosome best = population.get(0);
         for (Chromosome c : population) {
             if (c.getFitness() > best.getFitness()) {

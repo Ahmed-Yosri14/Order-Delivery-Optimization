@@ -1,8 +1,6 @@
 package Selection;
 
-import Chromosomes.BinaryChromosome;
 import Chromosomes.Chromosome;
-import Fitness.BinaryFitnessEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,15 +8,13 @@ import java.util.Random;
 
 public class TournamentSelection implements Selection {
     private int tournamentSize;
-    private BinaryFitnessEvaluator fitnessEvaluator;
     private static final Random random = new Random();
 
-    public TournamentSelection(int tournamentSize, BinaryFitnessEvaluator fitnessEvaluator) {
+    public TournamentSelection(int tournamentSize) {
         if (tournamentSize < 1) {
             throw new IllegalArgumentException("Tournament size must be at least 1");
         }
         this.tournamentSize = tournamentSize;
-        this.fitnessEvaluator = fitnessEvaluator;
     }
 
     @Override
@@ -76,12 +72,12 @@ public class TournamentSelection implements Selection {
 
     // Helper method to find the tournament winner
     private Chromosome findTournamentWinner(List<Chromosome> tournament) {
-        BinaryChromosome best = (BinaryChromosome) tournament.get(0);
-        int bestTime = fitnessEvaluator.calculateTotalRouteTime(best);
+        Chromosome best = tournament.get(0);
+        int bestTime = best.getTotalRouteTime();
 
         for (int i = 1; i < tournament.size(); i++) {
-            BinaryChromosome current = (BinaryChromosome) tournament.get(i);
-            int currentTime = fitnessEvaluator.calculateTotalRouteTime(current);
+            Chromosome current = tournament.get(i);
+            int currentTime = current.getTotalRouteTime();
 
             if (current.getFitness() > best.getFitness() ||
                     (current.getFitness() == best.getFitness() && currentTime < bestTime)) {

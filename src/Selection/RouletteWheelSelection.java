@@ -1,43 +1,33 @@
 package Selection;
 
-import Chromosomes.BinaryChromosome;
 import Chromosomes.Chromosome;
-import Fitness.BinaryFitnessEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class RouletteWheelSelection implements Selection {
-    private BinaryFitnessEvaluator fitnessEvaluator;
     private static final Random random = new Random();
 
-    public RouletteWheelSelection(BinaryFitnessEvaluator fitnessEvaluator) {
-        this.fitnessEvaluator = fitnessEvaluator;
+    public RouletteWheelSelection() {
     }
 
     @Override
     public Chromosome select(List<Chromosome> population) {
-        // Calculate total fitness of population
         double totalFitness = 0.0;
         List<Double> adjustedFitness = new ArrayList<>();
 
         for (Chromosome c : population) {
-            BinaryChromosome bc = (BinaryChromosome) c;
-            double fitness = bc.getFitness();
+            double fitness = c.getFitness();
 
-            // If fitness is 0 for all, give small probability to everyone
-            // Otherwise use actual fitness
             adjustedFitness.add(Double.valueOf(fitness > 0 ? fitness : 0.1));
             totalFitness += adjustedFitness.get(adjustedFitness.size() - 1);
         }
 
-        // Handle edge case where all fitness values are 0
         if (totalFitness == 0) {
             return population.get(random.nextInt(population.size()));
         }
 
-        // Spin the roulette wheel
         double randomValue = random.nextDouble() * totalFitness;
         double cumulativeFitness = 0.0;
 

@@ -47,7 +47,6 @@ public class TestReplacement {
         
         // Initialize fitness evaluator
         BinaryFitnessEvaluator.getInstance(distMatrix, timeConstraint);
-        BinaryFitnessEvaluator evaluator = BinaryFitnessEvaluator.getInstance();
         
         // Test each replacement strategy
         System.out.println("\n" + "=".repeat(70));
@@ -60,16 +59,16 @@ public class TestReplacement {
         
         switch (choice) {
             case 1:
-                testGenerationalReplacement(numOrders, popSize, generations, evaluator);
+                testGenerationalReplacement(numOrders, popSize, generations);
                 break;
             case 2:
-                testSteadyStateReplacement(numOrders, popSize, generations, evaluator);
+                testSteadyStateReplacement(numOrders, popSize, generations);
                 break;
             case 3:
-                testElitistReplacement(numOrders, popSize, generations, evaluator);
+                testElitistReplacement(numOrders, popSize, generations);
                 break;
             case 4:
-                compareAllStrategies(numOrders, popSize, generations, evaluator);
+                compareAllStrategies(numOrders, popSize, generations);
                 break;
             default:
                 System.out.println("Invalid choice!");
@@ -82,7 +81,7 @@ public class TestReplacement {
      * Test Generational Replacement Strategy
      */
     private static void testGenerationalReplacement(int numOrders, int popSize, 
-                                                   int generations, BinaryFitnessEvaluator evaluator) {
+                                                   int generations) {
         System.out.println("\n" + "=".repeat(70));
         System.out.println("TEST 1: GENERATIONAL REPLACEMENT (GGA)");
         System.out.println("=".repeat(70));
@@ -96,14 +95,14 @@ public class TestReplacement {
         List<Chromosome> population = initializePopulation(numOrders, popSize);
         
         // Setup GA components
-        TournamentSelection selection = new TournamentSelection(3, evaluator);
+        TournamentSelection selection = new TournamentSelection(3);
         OrderOneCrossover crossover = new OrderOneCrossover();
         
         // Track best fitness over generations
         List<Integer> fitnessHistory = new ArrayList<>();
         
         System.out.println("\n--- INITIAL POPULATION ---");
-        printPopulationStats(population, evaluator);
+        printPopulationStats(population);
         
         // Run GA with generational replacement
         for (int gen = 0; gen < generations; gen++) {
@@ -132,7 +131,7 @@ public class TestReplacement {
             
             if ((gen + 1) % 5 == 0 || gen == 0 || gen == generations - 1) {
                 System.out.println("\n--- GENERATION " + (gen + 1) + " ---");
-                printPopulationStats(population, evaluator);
+                printPopulationStats(population);
             }
         }
         
@@ -147,7 +146,7 @@ public class TestReplacement {
      * Test Steady-State Replacement Strategy
      */
     private static void testSteadyStateReplacement(int numOrders, int popSize, 
-                                                  int generations, BinaryFitnessEvaluator evaluator) {
+                                                  int generations) {
         System.out.println("\n" + "=".repeat(70));
         System.out.println("TEST 2: STEADY-STATE REPLACEMENT (SSGA)");
         System.out.println("=".repeat(70));
@@ -169,13 +168,13 @@ public class TestReplacement {
         List<Chromosome> population = initializePopulation(numOrders, popSize);
         
         // Setup GA components
-        TournamentSelection selection = new TournamentSelection(3, evaluator);
+        TournamentSelection selection = new TournamentSelection(3);
         OrderOneCrossover crossover = new OrderOneCrossover();
         
         List<Integer> fitnessHistory = new ArrayList<>();
         
         System.out.println("\n--- INITIAL POPULATION ---");
-        printPopulationStats(population, evaluator);
+        printPopulationStats(population);
         
         // Run GA with steady-state replacement
         for (int gen = 0; gen < generations; gen++) {
@@ -204,7 +203,7 @@ public class TestReplacement {
             
             if ((gen + 1) % 5 == 0 || gen == 0 || gen == generations - 1) {
                 System.out.println("\n--- GENERATION " + (gen + 1) + " ---");
-                printPopulationStats(population, evaluator);
+                printPopulationStats(population);
             }
         }
         
@@ -219,7 +218,7 @@ public class TestReplacement {
      * Test Elitist Replacement Strategy
      */
     private static void testElitistReplacement(int numOrders, int popSize, 
-                                              int generations, BinaryFitnessEvaluator evaluator) {
+                                              int generations) {
         System.out.println("\n" + "=".repeat(70));
         System.out.println("TEST 3: ELITIST REPLACEMENT");
         System.out.println("=".repeat(70));
@@ -240,14 +239,14 @@ public class TestReplacement {
         List<Chromosome> population = initializePopulation(numOrders, popSize);
         
         // Setup GA components
-        TournamentSelection selection = new TournamentSelection(3, evaluator);
+        TournamentSelection selection = new TournamentSelection(3);
         OrderOneCrossover crossover = new OrderOneCrossover();
         
         List<Integer> fitnessHistory = new ArrayList<>();
         List<Chromosome> bestOverallList = new ArrayList<>();
         
         System.out.println("\n--- INITIAL POPULATION ---");
-        printPopulationStats(population, evaluator);
+        printPopulationStats(population);
         Chromosome bestOverall = findBest(population).clone();
         
         // Run GA with elitist replacement
@@ -289,7 +288,7 @@ public class TestReplacement {
                 System.out.println("\n--- GENERATION " + (gen + 1) + " ---");
                 ElitistReplacement elitistStrategy = (ElitistReplacement) replacement;
                 System.out.println("Elites preserved: " + elitistStrategy.getEliteCount());
-                printPopulationStats(population, evaluator);
+                printPopulationStats(population);
                 System.out.println("Best-so-far Fitness: " + bestOverall.getFitness());
             }
         }
@@ -320,7 +319,7 @@ public class TestReplacement {
      * Compare all three strategies side-by-side
      */
     private static void compareAllStrategies(int numOrders, int popSize, 
-                                            int generations, BinaryFitnessEvaluator evaluator) {
+                                            int generations) {
         System.out.println("\n" + "=".repeat(70));
         System.out.println("COMPARATIVE ANALYSIS: ALL THREE STRATEGIES");
         System.out.println("=".repeat(70));
@@ -334,13 +333,13 @@ public class TestReplacement {
         Map<String, List<Integer>> results = new HashMap<>();
         
         System.out.println("\nRunning Generational Replacement...");
-        results.put("Generational", runStrategy(generational, numOrders, popSize, generations, evaluator));
+        results.put("Generational", runStrategy(generational, numOrders, popSize, generations));
         
         System.out.println("Running Steady-State Replacement...");
-        results.put("Steady-State", runStrategy(steadyState, numOrders, popSize, generations, evaluator));
+        results.put("Steady-State", runStrategy(steadyState, numOrders, popSize, generations));
         
         System.out.println("Running Elitist Replacement...");
-        results.put("Elitist", runStrategy(elitist, numOrders, popSize, generations, evaluator));
+        results.put("Elitist", runStrategy(elitist, numOrders, popSize, generations));
         
         // Display comparison
         System.out.println("\n" + "=".repeat(70));
@@ -369,9 +368,9 @@ public class TestReplacement {
      * Run a strategy and return fitness history
      */
     private static List<Integer> runStrategy(ReplacementStrategy replacement, int numOrders, 
-                                            int popSize, int generations, BinaryFitnessEvaluator evaluator) {
+                                            int popSize, int generations) {
         List<Chromosome> population = initializePopulation(numOrders, popSize);
-        TournamentSelection selection = new TournamentSelection(3, evaluator);
+        TournamentSelection selection = new TournamentSelection(3);
         OrderOneCrossover crossover = new OrderOneCrossover();
         List<Integer> fitnessHistory = new ArrayList<>();
         
@@ -425,7 +424,7 @@ public class TestReplacement {
         return best;
     }
     
-    private static void printPopulationStats(List<Chromosome> population, BinaryFitnessEvaluator evaluator) {
+    private static void printPopulationStats(List<Chromosome> population) {
         int maxFitness = Integer.MIN_VALUE;
         int minFitness = Integer.MAX_VALUE;
         double avgFitness = 0.0;
