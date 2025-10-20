@@ -63,9 +63,8 @@ public class Main {
             evaluator = IntegerFitnessEvaluator.getInstance();
             System.out.println("Using Integer Chromosome representation with direct sequence");
         } else {
-            // For floating point, we'll use integer evaluator as fallback
-            IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
-            evaluator = IntegerFitnessEvaluator.getInstance();
+            FloatingPointFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+            evaluator = FloatingPointFitnessEvaluator.getInstance();
             System.out.println("Using Floating Point Chromosome representation");
         }
 
@@ -90,8 +89,10 @@ public class Main {
         Crossover crossover;
         if (type == 1) {
             crossover = new OrderOneCrossover();
-        } else {
+        } else if (type == 2) {
             crossover = IntegerCrossover.getInstance();
+        } else {
+            crossover = new FloatingPointCrossover();
         }
 
         System.out.println("Choose Selection Method:");

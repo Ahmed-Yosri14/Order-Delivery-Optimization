@@ -51,6 +51,17 @@ public class IntegerFitnessEvaluator implements FitnessEvaluator {
 
     @Override
     public int calculateTotalRouteTime(Chromosome chromosome) {
-        return 0;
+        List<Integer> seq = chromosome.getDeliverySequence();
+        if (seq.isEmpty()) {
+            return 0;
+        }
+        int total = 0;
+        total += distMatrix.get(0).get(seq.get(0));
+        for (int i = 0; i < seq.size() - 1; i++) {
+            int cur = seq.get(i);
+            int nxt = seq.get(i + 1);
+            total += distMatrix.get(cur).get(nxt);
+        }
+        return total;
     }
 }

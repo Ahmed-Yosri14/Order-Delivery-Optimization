@@ -49,19 +49,38 @@ public class IntegerCrossover implements Crossover {
         }
 
         int size = seq1.size();
-        int cutPoint = random.nextInt(size - 1) + 1; // cut between 1 and size-1
+        int cut1 = random.nextInt(size);
+        int cut2 = random.nextInt(size);
+        if (cut1 > cut2) { int t = cut1; cut1 = cut2; cut2 = t; }
 
         List<Integer> child1Seq = new ArrayList<>();
         List<Integer> child2Seq = new ArrayList<>();
+        for (int i = 0; i < size; i++) { child1Seq.add(null); child2Seq.add(null); }
 
-        for (int i = 0; i < cutPoint; i++) {
-            child1Seq.add(seq1.get(i));
-            child2Seq.add(seq2.get(i));
+        for (int i = cut1; i <= cut2; i++) {
+            child1Seq.set(i, seq1.get(i));
+            child2Seq.set(i, seq2.get(i));
         }
-        for (int i = cutPoint; i < size; i++) {
-            child1Seq.add(seq2.get(i));
-            child2Seq.add(seq1.get(i));
+
+        int idx1 = (cut2 + 1) % size;
+        int idx2 = (cut2 + 1) % size;
+
+        for (int i = 0; i < size; i++) {
+            int p2gene = seq2.get((cut2 + 1 + i) % size);
+            if (!child1Seq.contains(p2gene)) {
+                child1Seq.set(idx1, p2gene);
+                idx1 = (idx1 + 1) % size;
+            }
         }
+
+        for (int i = 0; i < size; i++) {
+            int p1gene = seq1.get((cut2 + 1 + i) % size);
+            if (!child2Seq.contains(p1gene)) {
+                child2Seq.set(idx2, p1gene);
+                idx2 = (idx2 + 1) % size;
+            }
+        }
+
         IntegerChromosome child1 = new IntegerChromosome(child1Seq);
         IntegerChromosome child2 = new IntegerChromosome(child2Seq);
 

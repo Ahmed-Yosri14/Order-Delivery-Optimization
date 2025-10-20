@@ -48,10 +48,11 @@ public class FloatingPointFitnessEvaluator implements FitnessEvaluator {
         List<Integer> deliverySequence = chromosome.getDeliverySequence();
 
         if (deliverySequence.isEmpty()) return 0;
-        if (deliverySequence.size() == 1) return 1;
 
-        int currentTime = 0;
-        int currentLocation = deliverySequence.get(0);
+        int firstOrder = deliverySequence.get(0);
+        int currentTime = distanceMatrix.get(0).get(firstOrder);
+        if (currentTime > timeConstraint) return 0;
+        int currentLocation = firstOrder;
         int ordersDelivered = 1;
 
         for (int i = 1; i < deliverySequence.size(); i++) {
@@ -74,11 +75,11 @@ public class FloatingPointFitnessEvaluator implements FitnessEvaluator {
     public int calculateTotalRouteTime(Chromosome chromosome) {
         List<Integer> deliverySequence = chromosome.getDeliverySequence();
 
-        if (deliverySequence.isEmpty() || deliverySequence.size() == 1) {
+        if (deliverySequence.isEmpty()) {
             return 0;
         }
 
-        int totalTime = 0;
+        int totalTime = distanceMatrix.get(0).get(deliverySequence.get(0));
         for (int i = 0; i < deliverySequence.size() - 1; i++) {
             int currentOrder = deliverySequence.get(i);
             int nextOrder = deliverySequence.get(i + 1);

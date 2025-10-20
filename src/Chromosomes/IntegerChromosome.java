@@ -69,7 +69,7 @@ public class IntegerChromosome implements Chromosome {
 
     @Override
     public int getTotalRouteTime() {
-        return 0;
+        return fitnessEvaluator.calculateTotalRouteTime(this);
     }
 
     public void mutateBySwapping(int idx, double probability) {
