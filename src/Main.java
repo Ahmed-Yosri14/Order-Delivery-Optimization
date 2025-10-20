@@ -2,56 +2,12 @@ import Chromosomes.*;
 import Crossover.*;
 import Fitness.*;
 import Selection.*;
+import Replacement.*;
 
 import java.util.*;
 
 /**
- * Main class for Genetic Algorithm Order Delivery Optimization
- * 
- * This program implements a comprehensive genetic algorithm with the following phases:
- * 
- * PHASE 1: PROBLEM SETUP & PARAMETER CONFIGURATION
- * - User input for algorithm parameters
- * - Distance matrix generation for delivery points
- * - Time constraint definition
- * 
- * PHASE 2: CHROMOSOME REPRESENTATION & INITIALIZATION
- * - Binary Chromosome: Matrix representation for order positions
- * - Integer Chromosome: Direct sequence representation
- * - Floating Point Chromosome: Continuous value representation
- * - Population initialization using Initializer class
- * 
- * PHASE 3: FITNESS EVALUATION
- * - BinaryFitnessEvaluator: Evaluates binary chromosome fitness
- * - IntegerFitnessEvaluator: Evaluates integer chromosome fitness
- * - Time constraint validation
- * - Route optimization scoring
- * 
- * PHASE 4: SELECTION OPERATORS
- * - Tournament Selection: Competitive selection with configurable tournament size
- * - Roulette Wheel Selection: Probability-based selection
- * - Mating pool creation and parent selection
- * 
- * PHASE 5: CROSSOVER OPERATORS
- * - OrderOneCrossover: Order-based crossover for binary chromosomes
- * - IntegerCrossover: Single-point crossover for integer chromosomes
- * - Probability-based crossover application
- * 
- * PHASE 6: MUTATION OPERATORS
- * - Method 1: Position swapping mutation
- * - Method 2: Position shifting mutation
- * - Probability-based mutation application
- * 
- * PHASE 7: EVOLUTIONARY LOOP
- * - Generation-by-generation evolution
- * - Elite preservation strategy
- * - Population replacement
- * - Convergence tracking
- * 
- * PHASE 8: RESULTS ANALYSIS & REPORTING
- * - Best solution identification
- * - Performance statistics
- * - Delivery sequence optimization results
+ * Genetic Algorithm for Order Delivery Optimization
  */
 public class Main {
 
@@ -62,21 +18,8 @@ public class Main {
         System.out.println("================================================================");
         System.out.println("    GENETIC ALGORITHM FOR ORDER DELIVERY OPTIMIZATION");
         System.out.println("================================================================");
-        System.out.println("This program implements a comprehensive GA with 8 phases:");
-        System.out.println("1. Problem Setup & Parameter Configuration");
-        System.out.println("2. Chromosome Representation & Initialization");
-        System.out.println("3. Fitness Evaluation");
-        System.out.println("4. Selection Operators");
-        System.out.println("5. Crossover Operators");
-        System.out.println("6. Mutation Operators");
-        System.out.println("7. Evolutionary Loop");
-        System.out.println("8. Results Analysis & Reporting");
-        System.out.println("================================================================");
 
-        // ========================================
-        // PHASE 1: PROBLEM SETUP & PARAMETER CONFIGURATION
-        // ========================================
-        System.out.println("\n=== PHASE 1: PROBLEM SETUP & PARAMETER CONFIGURATION ===");
+        System.out.println("\n=== PROBLEM SETUP ===");
         
         System.out.println("Choose Chromosome Type:");
         System.out.println("1 - Binary (Matrix representation)");
@@ -107,10 +50,7 @@ public class Main {
         ArrayList<ArrayList<Integer>> distanceMatrix = getDistanceBetweenAllPoints(n);
         printDistanceMatrix(distanceMatrix);
 
-        // ========================================
-        // PHASE 2: CHROMOSOME REPRESENTATION & INITIALIZATION
-        // ========================================
-        System.out.println("\n=== PHASE 2: CHROMOSOME REPRESENTATION & INITIALIZATION ===");
+        System.out.println("\n=== INITIALIZATION ===");
         
         // Initialize fitness evaluator based on chromosome type
         FitnessEvaluator evaluator;
@@ -134,10 +74,7 @@ public class Main {
         List<Chromosome> population = initializer.init(type, numOrders, popSize);
         System.out.println("Population initialized with " + population.size() + " individuals");
 
-        // ========================================
-        // PHASE 3: FITNESS EVALUATION
-        // ========================================
-        System.out.println("\n=== PHASE 3: FITNESS EVALUATION ===");
+        System.out.println("\n=== FITNESS EVALUATION ===");
         
         // Evaluate initial population fitness
         for (Chromosome chromosome : population) {
@@ -148,18 +85,13 @@ public class Main {
         System.out.println("Initial best fitness: " + initialBest.getFitness());
         System.out.println("Initial best sequence: " + initialBest.getDeliverySequence());
 
-        // ========================================
-        // PHASE 4: SELECTION OPERATORS
-        // ========================================
-        System.out.println("\n=== PHASE 4: SELECTION OPERATORS ===");
+        System.out.println("\n=== SELECTION METHOD ===");
         
         Crossover crossover;
         if (type == 1) {
             crossover = new OrderOneCrossover();
-            System.out.println("Using OrderOneCrossover for binary chromosomes");
         } else {
             crossover = IntegerCrossover.getInstance();
-            System.out.println("Using IntegerCrossover for integer chromosomes");
         }
 
         System.out.println("Choose Selection Method:");
@@ -172,10 +104,33 @@ public class Main {
             System.out.println("Enter tournament size:");
             int tSize = sc.nextInt();
             selection = new TournamentSelection(tSize, (BinaryFitnessEvaluator) evaluator);
-            System.out.println("Using Tournament Selection with size: " + tSize);
         } else {
             selection = new RouletteWheelSelection((BinaryFitnessEvaluator) evaluator);
-            System.out.println("Using Roulette Wheel Selection");
+        }
+        
+        // Replacement Strategy
+        System.out.println("\nChoose Replacement Strategy:");
+        System.out.println("1 - Generational (Complete replacement)");
+        System.out.println("2 - Steady-State (K parents replaced)");
+        System.out.println("3 - Elitist (Keep best individuals)");
+        int replaceChoice = sc.nextInt();
+        
+        ReplacementStrategy replacementStrategy;
+        int offspringNeeded;
+        
+        if (replaceChoice == 1) {
+            replacementStrategy = new GenerationalReplacement();
+            offspringNeeded = popSize;
+        } else if (replaceChoice == 2) {
+            System.out.println("Enter K (number of parents to replace):");
+            int k = sc.nextInt();
+            replacementStrategy = new SteadyStateReplacement(k);
+            offspringNeeded = k;
+        } else {
+            System.out.println("Enter number of elite individuals:");
+            int eliteCount = sc.nextInt();
+            replacementStrategy = new ElitistReplacement(eliteCount);
+            offspringNeeded = popSize - eliteCount;
         }
 
         // ========================================
