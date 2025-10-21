@@ -88,7 +88,7 @@ public class Main {
         } else if (type == 2) {
             crossover = IntegerCrossover.getInstance();
         } else {
-            crossover = new FloatingPointCrossover();
+            crossover = new FloatingPointUniformCrossover();
         }
 
         System.out.println("Choose Selection Method:");

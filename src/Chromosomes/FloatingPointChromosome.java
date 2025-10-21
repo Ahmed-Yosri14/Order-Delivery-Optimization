@@ -9,26 +9,28 @@ import java.util.List;
 import java.util.Random;
 
 public class FloatingPointChromosome implements Chromosome {
-    List<Double> genes;
-    FloatingPointFitnessEvaluator evaluator = FloatingPointFitnessEvaluator.getInstance();
-    Random rand = new Random();
+    private List<Double> genes;
+    private final FloatingPointFitnessEvaluator evaluator = FloatingPointFitnessEvaluator.getInstance();
+    private final Random rand = new Random();
+
     public FloatingPointChromosome(List<Double> genes) {
         this.genes = new ArrayList<>(genes);
     }
-    public FloatingPointChromosome(){
+
+    public FloatingPointChromosome() {
         this.genes = new ArrayList<>();
-    }
-    @Override
-    public void mutateMethod1(double probability) {
-        for (int i = 0; i < genes.size(); i++) {
-            mutateByAverage(i, probability);
-        }
     }
 
     @Override
-    public void mutateMethod2(double probability) {
+    public void mutateMethod1(double probability) {
         for (int i = 0; i < genes.size(); i++) {
-            mutateByInvertingFraction(i, probability);
+            uniformMutation(i, probability);
+        }
+    }
+
+    public void mutateMethod2(double probability,int currentGen, int maxGen) {
+        for (int i = 0; i < genes.size(); i++) {
+            nonUniformMutation(i, probability, currentGen, maxGen);
         }
     }
 
@@ -53,42 +55,56 @@ public class FloatingPointChromosome implements Chromosome {
             genes = new ArrayList<>();
         }
         for (int i = 0; i < numberOfGenes; i++) {
-            genes.add(Double.valueOf(Math.random()));
+            genes.add(rand.nextDouble());
         }
     }
 
     @Override
     public List<Integer> getDeliverySequence() {
-        List<Integer>seq;
-        seq = new ArrayList<Integer>();
-        ArrayList<Pair> arr = new ArrayList<Pair>();
+        List<Integer> seq = new ArrayList<>();
+        List<Pair> arr = new ArrayList<>();
+
         for (int i = 0; i < genes.size(); i++) {
-            arr.add(new Pair (this.genes.get(i),i+1));
+            arr.add(new Pair(this.genes.get(i), i + 1));
         }
+
         Collections.sort(arr);
-        for (int i = 0; i < arr.size(); i++) {
-            seq.add(arr.get(i).getIdx());
+        for (Pair p : arr) {
+            seq.add(p.getIdx());
         }
+
         return seq;
     }
-    void mutateByInvertingFraction(int idx , Double probability) {
-        if (rand.nextDouble()<probability){
-            Double val = 1-genes.get(idx);
-            genes.set(idx,val);
+    private void uniformMutation(int idx, double probability) {
+        if (rand.nextDouble() < probability) {
+            genes.set(idx, rand.nextDouble());
         }
     }
-    void mutateByAverage(int idx , Double probability) {
-        if (rand.nextDouble()<probability){
-            Double val = rand.nextDouble()+genes.get(idx);
-            val/=2;
-            genes.set(idx,val);
+    private void nonUniformMutation(int idx, double probability, int currentGen, int maxGen) {
+        if (rand.nextDouble() < probability) {
+            double gene = genes.get(idx);
+            double a = 0.0;
+            double b = 1.0;
+            double r = rand.nextDouble();
+            double bFactor = 5.0;
+            double delta;
+
+            if (rand.nextBoolean()) {
+                double y = b - gene;
+                delta = y * (1 - Math.pow(r, Math.pow(1.0 - (double) currentGen / maxGen, bFactor)));
+                gene += delta;
+            } else {
+                double y = gene - a;
+                delta = y * (1 - Math.pow(r, Math.pow(1.0 - (double) currentGen / maxGen, bFactor)));
+                gene -= delta;
+            }
+
+            gene = Math.max(a, Math.min(b, gene));
+            genes.set(idx, gene);
         }
     }
 
     public List<Double> getGenes() {
         return new ArrayList<>(genes);
     }
-
-
-
 }

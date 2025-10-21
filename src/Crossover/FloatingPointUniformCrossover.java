@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class FloatingPointCrossover implements Crossover {
+public class FloatingPointUniformCrossover implements Crossover {
 
     private static final Random random = new Random();
 
@@ -16,7 +16,6 @@ public class FloatingPointCrossover implements Crossover {
         if (!(parent1 instanceof FloatingPointChromosome) || !(parent2 instanceof FloatingPointChromosome)) {
             throw new IllegalArgumentException("FloatingPointCrossover only works with FloatingPointChromosome");
         }
-
         List<Chromosome> offspring = new ArrayList<>();
 
         if (random.nextDouble() > probability) {
@@ -40,10 +39,13 @@ public class FloatingPointCrossover implements Crossover {
 
         for (int i = 0; i < g1.size(); i++) {
             double alpha = random.nextDouble();
-            double v1 = alpha * g1.get(i) + (1 - alpha) * g2.get(i);
-            double v2 = alpha * g2.get(i) + (1 - alpha) * g1.get(i);
-            c1.add(v1);
-            c2.add(v2);
+            if (alpha >= 0.5) {
+                c1.add(g1.get(i));
+                c2.add(g2.get(i));
+            } else {
+                c1.add(g2.get(i));
+                c2.add(g1.get(i));
+            }
         }
 
         offspring.add(new FloatingPointChromosome(c1));

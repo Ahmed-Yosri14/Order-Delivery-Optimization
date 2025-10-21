@@ -102,10 +102,7 @@ public class BinaryChromosome implements Chromosome {
         }
     }
 
-    @Override
-    public void mutateMethod2(double probability) {
 
-    }
 
     public List<List<Boolean>> getGenes() {
         return genes;

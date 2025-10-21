@@ -51,13 +51,6 @@ public class IntegerChromosome implements Chromosome {
     }
 
     @Override
-    public void mutateMethod2(double probability) {
-        for (int i = 0; i < genes.size(); i++) {
-            mutateByBecomingLast(i, probability);
-        }
-    }
-
-    @Override
     public int getFitness() {
         return fitnessEvaluator.evaluate(this);
     }
