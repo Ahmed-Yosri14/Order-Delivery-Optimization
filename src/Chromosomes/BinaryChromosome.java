@@ -157,4 +157,21 @@ public class BinaryChromosome implements Chromosome {
         sb.append("}");
         return sb.toString();
     }
+
+    @Override
+    public String printGenes() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < genes.size(); i++) {
+            sb.append("[");
+            for (int j = 0; j < genes.get(i).size(); j++) {
+                sb.append(genes.get(i).get(j).booleanValue() ? "1" : "0");
+                if (j < genes.get(i).size() - 1) sb.append(", ");
+            }
+            sb.append("]");
+            if (i < genes.size() - 1) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

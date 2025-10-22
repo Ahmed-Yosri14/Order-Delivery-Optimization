@@ -9,4 +9,5 @@ public interface Chromosome {
     int getFitness();
     Chromosome clone();
     int getTotalRouteTime();
+    String printGenes();
 }

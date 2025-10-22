@@ -80,4 +80,8 @@ public class IntegerChromosome implements Chromosome {
         }
     }
 
+    @Override
+    public String printGenes() {
+        return genes.toString();
+    }
 }

@@ -7,13 +7,8 @@ import Replacement.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Genetic Algorithm Engine - Configurable GA library for optimization problems
- * Supports multiple chromosome types, selection methods, crossover operators, and replacement strategies
- */
 public class GeneticAlgorithm {
     
-    // GA Configuration Parameters
     private int populationSize = 50;
     private int chromosomeLength = 10;
     private int generations = 100;
@@ -21,14 +16,13 @@ public class GeneticAlgorithm {
     private double mutationRate = 0.01;
     private int eliteCount = 1;
     
-    // Problem-specific components
     private FitnessEvaluator fitnessFunction;
     private ChromosomeType chromosomeType = ChromosomeType.INTEGER;
     private Selection selectionMethod;
     private Crossover crossoverOperator;
     private ReplacementStrategy replacementStrategy;
+    private int floatingPointMutationMethod = 1; // 1 = uniform (mutateMethod1), 2 = non-uniform (mutateMethod2)
     
-    // Population and results
     private List<Chromosome> population;
     private Chromosome bestSolution;
     private List<Double> fitnessHistory;
@@ -38,18 +32,12 @@ public class GeneticAlgorithm {
         BINARY, INTEGER, FLOATING_POINT
     }
     
-    /**
-     * Default constructor with preset values
-     */
     public GeneticAlgorithm() {
         this.fitnessHistory = new ArrayList<>();
         this.selectionMethod = new TournamentSelection(3);
         this.replacementStrategy = new ElitistReplacement(1);
     }
     
-    /**
-     * Initialize the GA population
-     */
     public void initialize() {
         if (fitnessFunction == null) {
             throw new IllegalStateException("Fitness function must be set before initialization");
@@ -61,7 +49,6 @@ public class GeneticAlgorithm {
         
         population = initializer.init(typeChoice, chromosomeLength, populationSize);
         
-        // Set default crossover based on chromosome type if not set
         if (crossoverOperator == null) {
             switch (chromosomeType) {
                 case BINARY:
@@ -76,7 +63,6 @@ public class GeneticAlgorithm {
             }
         }
         
-        // Evaluate initial population
         for (Chromosome chromosome : population) {
             chromosome.getFitness();
         }
@@ -85,9 +71,6 @@ public class GeneticAlgorithm {
         initialized = true;
     }
     
-    /**
-     * Run the genetic algorithm
-     */
     public void run() {
         if (!initialized) {
             initialize();
@@ -103,22 +86,17 @@ public class GeneticAlgorithm {
         System.out.println("Initial Best Fitness: " + bestSolution.getFitness());
         
         for (int gen = 0; gen < generations; gen++) {
-            // Create offspring through genetic operators
-            List<Chromosome> offspring = createOffspring();
+            List<Chromosome> offspring = createOffspring(gen, generations);
             
-            // Replace population using replacement strategy
             population = replacementStrategy.replace(population, offspring);
             
-            // Track best solution
             Chromosome currentBest = findBest(population);
             if (currentBest.getFitness() > bestSolution.getFitness()) {
                 bestSolution = currentBest.clone();
             }
             
-            // Record statistics
             fitnessHistory.add((double) currentBest.getFitness());
             
-            // Progress reporting
             if ((gen + 1) % 10 == 0 || gen == 0 || gen == generations - 1) {
                 System.out.println("Generation " + (gen + 1) + 
                                  " - Best Fitness: " + currentBest.getFitness() +
@@ -131,24 +109,30 @@ public class GeneticAlgorithm {
         System.out.println("Best Solution: " + bestSolution.getDeliverySequence());
     }
     
-    /**
-     * Create offspring through selection, crossover, and mutation
-     */
-    private List<Chromosome> createOffspring() {
+    private List<Chromosome> createOffspring(int currentGen, int maxGen) {
         List<Chromosome> offspring = new ArrayList<>();
         
-        // Keep creating offspring until we have enough
         while (offspring.size() < populationSize) {
-            // Selection
             Chromosome parent1 = selectionMethod.select(population);
             Chromosome parent2 = selectionMethod.select(population);
             
-            // Crossover
             List<Chromosome> children = crossoverOperator.crossover(parent1, parent2, crossoverRate);
             
-            // Mutation
             for (Chromosome child : children) {
-                child.mutateMethod1(mutationRate);
+                try {
+                    if (child.getClass().getName().equals("Chromosomes.FloatingPointChromosome")) {
+                        if (floatingPointMutationMethod == 1) {
+                            child.getClass().getMethod("mutateMethod1", double.class).invoke(child, mutationRate);
+                        } else {
+                            child.getClass().getMethod("mutateMethod2", double.class, int.class, int.class)
+                                    .invoke(child, mutationRate, currentGen, maxGen);
+                        }
+                    } else {
+                        child.mutateMethod1(mutationRate);
+                    }
+                } catch (Exception e) {
+                    child.mutateMethod1(mutationRate);
+                }
                 offspring.add(child);
                 if (offspring.size() >= populationSize) break;
             }
@@ -157,9 +141,6 @@ public class GeneticAlgorithm {
         return offspring;
     }
     
-    /**
-     * Find the best chromosome in the population
-     */
     private Chromosome findBest(List<Chromosome> pop) {
         Chromosome best = pop.get(0);
         for (Chromosome c : pop) {
@@ -170,9 +151,6 @@ public class GeneticAlgorithm {
         return best;
     }
     
-    /**
-     * Calculate average fitness of current population
-     */
     private double getAverageFitness() {
         return population.stream()
                 .mapToInt(Chromosome::getFitness)
@@ -278,9 +256,6 @@ public class GeneticAlgorithm {
         this.eliteCount = eliteCount;
     }
     
-    /**
-     * Print detailed statistics about the GA run
-     */
     public void printStatistics() {
         if (bestSolution == null) {
             System.out.println("No solution available. Run the algorithm first.");

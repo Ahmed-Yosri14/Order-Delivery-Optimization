@@ -138,4 +138,15 @@ public class FloatingPointChromosome implements Chromosome {
     public List<Double> getGenes() {
         return new ArrayList<>(genes);
     }
+    @Override
+    public String printGenes() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < genes.size(); i++) {
+            sb.append(String.format("%.4f", genes.get(i)));
+            if (i < genes.size() - 1) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }
