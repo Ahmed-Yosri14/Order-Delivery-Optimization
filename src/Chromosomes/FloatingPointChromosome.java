@@ -77,9 +77,40 @@ public class FloatingPointChromosome implements Chromosome {
     }
     private void uniformMutation(int idx, double probability) {
         if (rand.nextDouble() < probability) {
-            genes.set(idx, rand.nextDouble());
+            double gene = genes.get(idx);
+            double LB = 0.0;
+            double UB = 1.0;
+
+            // Generate random r11 ∈ [0, 1]
+            double r11 = rand.nextDouble();
+
+            double delta;
+            boolean moveLeft;
+
+            if (r11 <= 0.5) {
+                delta = gene - LB;  // ΔL
+                moveLeft = true;
+            } else {
+                delta = UB - gene;  // ΔU
+                moveLeft = false;
+            }
+
+            // Generate r12 ∈ [0, Δ]
+            double r12 = rand.nextDouble() * delta;
+
+            if (moveLeft) {
+                gene -= r12;
+            } else {
+                gene += r12;
+            }
+
+            // keep it between LB, UB
+            gene = Math.max(LB, Math.min(UB, gene));
+
+            genes.set(idx, gene);
         }
     }
+
     private void nonUniformMutation(int idx, double probability, int currentGen, int maxGen) {
         if (rand.nextDouble() < probability) {
             double gene = genes.get(idx);
