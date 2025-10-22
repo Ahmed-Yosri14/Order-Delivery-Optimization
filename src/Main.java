@@ -16,32 +16,43 @@ public class Main {
         System.out.println("================================================================");
         System.out.println("    GENETIC ALGORITHM FOR ORDER DELIVERY OPTIMIZATION");
         System.out.println("================================================================");
+        System.out.println("\nNOTE: Press Enter without typing to use default values");
+        System.out.println("      Or type your custom value and press Enter\n");
 
         System.out.println("\n=== PROBLEM SETUP ===");
         
-        System.out.println("Choose Chromosome Type:");
+        // Default values
+        int defaultType = 2;
+        int defaultNumOrders = 8;
+        int defaultPopSize = 50;
+        int defaultGenerations = 100;
+        double defaultCrossoverProb = 0.7;
+        double defaultMutationProb = 0.02;
+        int defaultTimeConstraint = 200;
+        
+        System.out.println("Choose Chromosome Type (default: " + defaultType + "):");
         System.out.println("1 - Binary (Matrix representation)");
         System.out.println("2 - Integer (Direct sequence)");
         System.out.println("3 - Floating Point (Continuous values)");
-        int type = sc.nextInt();
+        int type = getIntInput(sc, defaultType);
 
-        System.out.println("Enter number of delivery points (excluding depot):");
-        int numOrders = sc.nextInt();
+        System.out.println("Enter number of delivery points, excluding depot (default: " + defaultNumOrders + "):");
+        int numOrders = getIntInput(sc, defaultNumOrders);
 
-        System.out.println("Enter population size:");
-        int popSize = sc.nextInt();
+        System.out.println("Enter population size (default: " + defaultPopSize + "):");
+        int popSize = getIntInput(sc, defaultPopSize);
 
-        System.out.println("Enter number of generations:");
-        int generations = sc.nextInt();
+        System.out.println("Enter number of generations (default: " + defaultGenerations + "):");
+        int generations = getIntInput(sc, defaultGenerations);
 
-        System.out.println("Enter crossover probability (0.0 - 1.0):");
-        double crossoverProb = sc.nextDouble();
+        System.out.println("Enter crossover probability 0.0-1.0 (default: " + defaultCrossoverProb + "):");
+        double crossoverProb = getDoubleInput(sc, defaultCrossoverProb);
 
-        System.out.println("Enter mutation probability (0.0 - 1.0):");
-        double mutationProb = sc.nextDouble();
+        System.out.println("Enter mutation probability 0.0-1.0 (default: " + defaultMutationProb + "):");
+        double mutationProb = getDoubleInput(sc, defaultMutationProb);
 
-        System.out.println("Enter time constraint (total delivery time limit):");
-        int timeConstraint = sc.nextInt();
+        System.out.println("Enter time constraint, total delivery time limit (default: " + defaultTimeConstraint + "):");
+        int timeConstraint = getIntInput(sc, defaultTimeConstraint);
 
         // Generate distance matrix
         int n = numOrders + 1; // +1 for depot
@@ -91,39 +102,44 @@ public class Main {
             crossover = new FloatingPointUniformCrossover();
         }
 
-        System.out.println("Choose Selection Method:");
+        int defaultSelType = 1;
+        int defaultTournamentSize = 3;
+        
+        System.out.println("Choose Selection Method (default: " + defaultSelType + "):");
         System.out.println("1 - Tournament Selection");
         System.out.println("2 - Roulette Wheel Selection");
-        int selType = sc.nextInt();
+        int selType = getIntInput(sc, defaultSelType);
 
         Selection selection;
         if (selType == 1) {
-            System.out.println("Enter tournament size:");
-            int tSize = sc.nextInt();
+            System.out.println("Enter tournament size (default: " + defaultTournamentSize + "):");
+            int tSize = getIntInput(sc, defaultTournamentSize);
             selection = new TournamentSelection(tSize);
         } else {
             selection = new RouletteWheelSelection();
         }
         
         // Replacement Strategy
-        System.out.println("\nChoose Replacement Strategy:");
+        int defaultReplaceChoice = 3;
+        int defaultK = 2;
+        int defaultEliteCount = 2;
+        
+        System.out.println("\nChoose Replacement Strategy (default: " + defaultReplaceChoice + "):");
         System.out.println("1 - Generational (Complete replacement)");
         System.out.println("2 - Steady-State (K parents replaced)");
         System.out.println("3 - Elitist (Keep best individuals)");
-        int replaceChoice = sc.nextInt();
+        int replaceChoice = getIntInput(sc, defaultReplaceChoice);
         
-        // Note: Replacement strategies are available but not used in the current implementation
-        // The main loop uses elite preservation instead
         if (replaceChoice == 1) {
-            System.out.println("Generational replacement selected (using elite preservation)");
+            System.out.println("Generational replacement selected");
         } else if (replaceChoice == 2) {
-            System.out.println("Enter K (number of parents to replace):");
-            sc.nextInt(); // consume input
-            System.out.println("Steady-state replacement selected (using elite preservation)");
+            System.out.println("Enter K, number of parents to replace (default: " + defaultK + "):");
+            int k = getIntInput(sc, defaultK);
+            System.out.println("Steady-state replacement selected (K=" + k + ")");
         } else {
-            System.out.println("Enter number of elite individuals:");
-            sc.nextInt(); // consume input
-            System.out.println("Elitist replacement selected (using elite preservation)");
+            System.out.println("Enter number of elite individuals (default: " + defaultEliteCount + "):");
+            int eliteCount = getIntInput(sc, defaultEliteCount);
+            System.out.println("Elitist replacement selected (elite count=" + eliteCount + ")");
         }
 
         // ========================================
@@ -369,6 +385,43 @@ public class Main {
                 System.out.printf("%4d", matrix.get(i).get(j));
             }
             System.out.println();
+        }
+    }
+
+    /**
+     * Get integer input from user with default value support
+     * If user just presses Enter, the default value is used
+     */
+    public static int getIntInput(Scanner sc, int defaultValue) {
+        sc.nextLine(); // Clear buffer
+        String input = sc.nextLine().trim();
+        if (input.isEmpty()) {
+            System.out.println("  Using default: " + defaultValue);
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            System.out.println("  Invalid input. Using default: " + defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get double input from user with default value support
+     * If user just presses Enter, the default value is used
+     */
+    public static double getDoubleInput(Scanner sc, double defaultValue) {
+        String input = sc.nextLine().trim();
+        if (input.isEmpty()) {
+            System.out.println("  Using default: " + defaultValue);
+            return defaultValue;
+        }
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException e) {
+            System.out.println("  Invalid input. Using default: " + defaultValue);
+            return defaultValue;
         }
     }
 }
