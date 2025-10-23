@@ -36,7 +36,8 @@ public class FitnessEvaluator {
         instance = null;
     }
     public double evaluate(Chromosome chromosome) {
-        return calculateOnTimeDeliveries(chromosome);
+        double alpha = 0.01;
+        return calculateOnTimeDeliveries(chromosome)-alpha*(calculateTotalRouteTime(chromosome)-timeConstraint);
     }
 
     public int calculateTotalRouteTime(Chromosome chromosome) {
