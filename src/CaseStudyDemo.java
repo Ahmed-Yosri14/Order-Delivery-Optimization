@@ -15,7 +15,6 @@ import java.util.Random;
  * 
  * Constraints:
  * - Time limit for all deliveries
- * - Must start from depot (location 0)
  * - Travel time between locations varies
  * 
  * Solution Approach:
@@ -31,15 +30,13 @@ public class CaseStudyDemo {
         
         // ==================== Problem Setup ====================
         
-        // Problem parameters
-        int numberOfDeliveryPoints = 8;  // Excluding depot
-        int timeConstraint = 200;        // Maximum total delivery time
+        int numberOfDeliveryPoints = 8;
+        int timeConstraint = 120;
         
         System.out.println("Problem Configuration:");
         System.out.println("  Number of delivery points: " + numberOfDeliveryPoints);
         System.out.println("  Time constraint: " + timeConstraint + " units");
         
-        // Generate distance matrix (travel times between locations)
         ArrayList<ArrayList<Integer>> distanceMatrix = generateDistanceMatrix(numberOfDeliveryPoints + 1);
         
         System.out.println("\nDistance Matrix (Travel Times):");
@@ -47,31 +44,26 @@ public class CaseStudyDemo {
         
         // ==================== Fitness Function Definition ====================
         
-        // Initialize the fitness evaluator (problem-dependent)
         IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
         
-        // Define the fitness function using the interface
         FitnessEvaluator fitnessFunction = IntegerFitnessEvaluator.getInstance();
         
         // ==================== Configure Genetic Algorithm ====================
         
         System.out.println("\n=== Configuring Genetic Algorithm ===");
         
-        // Create and configure the GA engine
         GeneticAlgorithm ga_engine = new GeneticAlgorithm();
         
-        // Set GA parameters
         ga_engine.setPopulationSize(50);
         ga_engine.setChromosomeLength(numberOfDeliveryPoints);
         ga_engine.setFitnessFunction(fitnessFunction);
         ga_engine.setChromosomeType(GeneticAlgorithm.ChromosomeType.INTEGER);
         
-        // Set genetic operators parameters
         ga_engine.setCrossoverRate(0.7);
         ga_engine.setMutationRate(0.02);
         ga_engine.setGenerations(100);
         
-        // Optional: Customize selection and replacement strategies
+        // Customize selection and replacement strategies
         ga_engine.setSelectionMethod(new TournamentSelection(3));
         ga_engine.setReplacementStrategy(new ElitistReplacement(2));
         
@@ -118,10 +110,7 @@ public class CaseStudyDemo {
         System.out.println("           CASE STUDY DEMONSTRATION COMPLETED");
         System.out.println("================================================================");
     }
-    
-    /**
-     * Generate a symmetric distance matrix with random values
-     */
+
     private static ArrayList<ArrayList<Integer>> generateDistanceMatrix(int n) {
         ArrayList<ArrayList<Integer>> distanceMatrix = new ArrayList<>();
         Random rand = new Random(42); // Fixed seed for reproducibility
@@ -141,10 +130,7 @@ public class CaseStudyDemo {
         }
         return distanceMatrix;
     }
-    
-    /**
-     * Print the distance matrix in a formatted way
-     */
+
     private static void printDistanceMatrix(ArrayList<ArrayList<Integer>> matrix) {
         System.out.print("     ");
         for (int i = 0; i < matrix.size(); i++) {
@@ -160,10 +146,7 @@ public class CaseStudyDemo {
             System.out.println();
         }
     }
-    
-    /**
-     * Print detailed route information including step-by-step travel times
-     */
+
     private static void printDetailedRoute(Chromosome solution, ArrayList<ArrayList<Integer>> distanceMatrix) {
         var sequence = solution.getDeliverySequence();
         

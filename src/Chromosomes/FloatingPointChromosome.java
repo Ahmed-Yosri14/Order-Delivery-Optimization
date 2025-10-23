@@ -68,7 +68,6 @@ public class FloatingPointChromosome implements Chromosome {
             arr.add(new Pair(this.genes.get(i), i + 1));
         }
 
-        Collections.sort(arr);
         for (Pair p : arr) {
             seq.add(p.getIdx());
         }
