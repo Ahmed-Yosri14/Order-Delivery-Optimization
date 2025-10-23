@@ -1,6 +1,6 @@
 package Chromosomes;
 
-import Fitness.FloatingPointFitnessEvaluator;
+import Fitness.FitnessEvaluator;
 import Helpers.Pair;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class FloatingPointChromosome implements Chromosome {
     private List<Double> genes;
-    private final FloatingPointFitnessEvaluator evaluator = FloatingPointFitnessEvaluator.getInstance();
+    private final FitnessEvaluator evaluator = FitnessEvaluator.getInstance();
     private final Random rand = new Random();
 
     public FloatingPointChromosome(List<Double> genes) {
@@ -36,7 +36,7 @@ public class FloatingPointChromosome implements Chromosome {
 
     @Override
     public int getFitness() {
-        return evaluator.evaluate(this);
+        return (int) evaluator.evaluate(this);
     }
 
     @Override

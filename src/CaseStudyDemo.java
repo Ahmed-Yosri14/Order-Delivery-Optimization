@@ -44,9 +44,9 @@ public class CaseStudyDemo {
         
         // ==================== Fitness Function Definition ====================
         
-        IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+        FitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
         
-        FitnessEvaluator fitnessFunction = IntegerFitnessEvaluator.getInstance();
+        FitnessEvaluator fitnessFunction = FitnessEvaluator.getInstance();
         
         // ==================== Configure Genetic Algorithm ====================
         

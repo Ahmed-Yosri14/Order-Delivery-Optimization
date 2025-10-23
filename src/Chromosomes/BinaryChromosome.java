@@ -1,8 +1,7 @@
 package Chromosomes;
 
-import Fitness.BinaryFitnessEvaluator;
+
 import Fitness.FitnessEvaluator;
-import Fitness.IntegerFitnessEvaluator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +12,7 @@ public class BinaryChromosome implements Chromosome {
     private List<List<Boolean>> genes;
     private Integer fitness;
     private static final Random random = new Random();
-    BinaryFitnessEvaluator evaluator = BinaryFitnessEvaluator.getInstance();
+    FitnessEvaluator evaluator =   FitnessEvaluator.getInstance();
 
     //Constructors
     public BinaryChromosome() {
@@ -120,7 +119,7 @@ public class BinaryChromosome implements Chromosome {
     }
 
     public int getFitness() {
-        return evaluator.evaluate(this);
+        return (int) evaluator.evaluate(this);
     }
 
     @Override
@@ -131,7 +130,7 @@ public class BinaryChromosome implements Chromosome {
 
     @Override
     public int getTotalRouteTime() {
-        return evaluator.calculateTotalRouteTime(this);
+        return (int) Math.floor(evaluator.calculateTotalRouteTime(this));
     }
 
 

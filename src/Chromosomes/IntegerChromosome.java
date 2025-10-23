@@ -1,6 +1,7 @@
 package Chromosomes;
 
-import Fitness.IntegerFitnessEvaluator;
+import Fitness.FitnessEvaluator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Random;
 public class IntegerChromosome implements Chromosome {
     private List<Integer> genes;
     private static final Random rand = new Random();
-    private IntegerFitnessEvaluator fitnessEvaluator = IntegerFitnessEvaluator.getInstance();
+    private FitnessEvaluator fitnessEvaluator = FitnessEvaluator.getInstance();
 
     public IntegerChromosome(List<Integer> genes) {
         this.genes = new ArrayList<>(genes);
@@ -21,7 +22,7 @@ public class IntegerChromosome implements Chromosome {
 
     public IntegerChromosome(IntegerChromosome other) {
         this.genes = new ArrayList<>(other.genes); // deep copy
-        this.fitnessEvaluator = IntegerFitnessEvaluator.getInstance();
+        this.fitnessEvaluator = FitnessEvaluator.getInstance();
     }
 
     @Override
@@ -52,7 +53,7 @@ public class IntegerChromosome implements Chromosome {
 
     @Override
     public int getFitness() {
-        return fitnessEvaluator.evaluate(this);
+        return (int) fitnessEvaluator.evaluate(this);
     }
 
     @Override

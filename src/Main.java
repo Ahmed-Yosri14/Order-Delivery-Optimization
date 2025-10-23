@@ -79,9 +79,7 @@ public class Main {
         System.out.println("\n=== INITIALIZATION ===");
 
         // Initialize all fitness evaluators with the same problem parameters
-        BinaryFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
-        IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
-        FloatingPointFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
+        FitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
 
         // Display chromosome type information
         if (type == 1) {
