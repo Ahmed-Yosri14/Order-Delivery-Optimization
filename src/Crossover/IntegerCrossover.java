@@ -54,19 +54,24 @@ public class IntegerCrossover implements Crossover {
         List<Integer> child1 = new ArrayList<>(Collections.nCopies(size, null));
         List<Integer> child2 = new ArrayList<>(Collections.nCopies(size, null));
 
-        for (int gene = 0; gene < size; gene++) {
+        for (int gene = 1; gene <= size; gene++) {
             double alpha = random.nextDouble();
+
+            int target1, target2;
             if (alpha >= 0.5) {
-                int pos1 = idxP2.get(gene + 1); // assuming genes are 1..n
-                pos1 = findNextEmptySlot(child1, pos1);
-                child1.set(pos1, gene + 1);
-
-                int pos2 = idxP1.get(gene + 1);
-                pos2 = findNextEmptySlot(child2, pos2);
-                child2.set(pos2, gene + 1);
+                target1 = idxP2.get(gene);
+                target2 = idxP1.get(gene);
+            } else {
+                target1 = idxP1.get(gene);
+                target2 = idxP2.get(gene);
             }
-        }
 
+            target1 = findNextEmptySlot(child1, target1);
+            child1.set(target1, gene);
+
+            target2 = findNextEmptySlot(child2, target2);
+            child2.set(target2, gene);
+        }
         fillRemaining(child1, size);
         fillRemaining(child2, size);
 
