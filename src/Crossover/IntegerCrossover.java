@@ -2,9 +2,7 @@ package Crossover;
 
 import Chromosomes.Chromosome;
 import Chromosomes.IntegerChromosome;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class IntegerCrossover implements Crossover {
 
@@ -44,49 +42,61 @@ public class IntegerCrossover implements Crossover {
         List<Integer> seq1 = p1.getDeliverySequence();
         List<Integer> seq2 = p2.getDeliverySequence();
 
-        if (seq1.size() != seq2.size() || seq1.size() < 2) {
-            throw new IllegalArgumentException("Parents must have same size and at least 2 genes");
-        }
-
         int size = seq1.size();
-        int cut1 = random.nextInt(size);
-        int cut2 = random.nextInt(size);
-        if (cut1 > cut2) { int t = cut1; cut1 = cut2; cut2 = t; }
 
-        List<Integer> child1Seq = new ArrayList<>();
-        List<Integer> child2Seq = new ArrayList<>();
-        for (int i = 0; i < size; i++) { child1Seq.add(null); child2Seq.add(null); }
-
-        for (int i = cut1; i <= cut2; i++) {
-            child1Seq.set(i, seq1.get(i));
-            child2Seq.set(i, seq2.get(i));
+        Map<Integer, Integer> idxP1 = new HashMap<>();
+        Map<Integer, Integer> idxP2 = new HashMap<>();
+        for (int i = 0; i < size; i++) {
+            idxP1.put(seq1.get(i), i);
+            idxP2.put(seq2.get(i), i);
         }
 
-        int idx1 = (cut2 + 1) % size;
-        int idx2 = (cut2 + 1) % size;
+        List<Integer> child1 = new ArrayList<>(Collections.nCopies(size, null));
+        List<Integer> child2 = new ArrayList<>(Collections.nCopies(size, null));
 
-        for (int i = 0; i < size; i++) {
-            int p2gene = seq2.get((cut2 + 1 + i) % size);
-            if (!child1Seq.contains(p2gene)) {
-                child1Seq.set(idx1, p2gene);
-                idx1 = (idx1 + 1) % size;
+        for (int gene = 0; gene < size; gene++) {
+            double alpha = random.nextDouble();
+            if (alpha >= 0.5) {
+                int pos1 = idxP2.get(gene + 1); // assuming genes are 1..n
+                pos1 = findNextEmptySlot(child1, pos1);
+                child1.set(pos1, gene + 1);
+
+                int pos2 = idxP1.get(gene + 1);
+                pos2 = findNextEmptySlot(child2, pos2);
+                child2.set(pos2, gene + 1);
             }
         }
 
-        for (int i = 0; i < size; i++) {
-            int p1gene = seq1.get((cut2 + 1 + i) % size);
-            if (!child2Seq.contains(p1gene)) {
-                child2Seq.set(idx2, p1gene);
-                idx2 = (idx2 + 1) % size;
-            }
-        }
+        fillRemaining(child1, size);
+        fillRemaining(child2, size);
 
-        IntegerChromosome child1 = new IntegerChromosome(child1Seq);
-        IntegerChromosome child2 = new IntegerChromosome(child2Seq);
-
-        offspring.add(child1);
-        offspring.add(child2);
+        offspring.add(new IntegerChromosome(child1));
+        offspring.add(new IntegerChromosome(child2));
 
         return offspring;
+    }
+
+    private int findNextEmptySlot(List<Integer> list, int startIdx) {
+        int n = list.size();
+        int idx = startIdx;
+        for (int i = 0; i < n; i++) {
+            if (list.get(idx) == null) return idx;
+            idx = (idx + 1) % n;
+        }
+        return startIdx;
+    }
+
+    private void fillRemaining(List<Integer> child, int size) {
+        Set<Integer> present = new HashSet<>(child);
+        List<Integer> missing = new ArrayList<>();
+        for (int i = 1; i <= size; i++) {
+            if (!present.contains(i)) missing.add(i);
+        }
+        int mIdx = 0;
+        for (int i = 0; i < size; i++) {
+            if (child.get(i) == null) {
+                child.set(i, missing.get(mIdx++));
+            }
+        }
     }
 }
