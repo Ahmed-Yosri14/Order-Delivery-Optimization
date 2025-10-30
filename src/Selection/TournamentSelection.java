@@ -35,10 +35,6 @@ public class TournamentSelection implements Selection {
         return createMatingPool(population, count);
     }
 
-    // Implementation that exactly follows your methodology
-    public List<Chromosome> createMatingPool(List<Chromosome> population) {
-        return createMatingPool(population, population.size());
-    }
 
     public List<Chromosome> createMatingPool(List<Chromosome> population, int targetSize) {
         List<Chromosome> matingPool = new ArrayList<>();
