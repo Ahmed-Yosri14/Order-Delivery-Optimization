@@ -10,7 +10,6 @@ public class FitnessEvaluator {
 
     private final ArrayList<ArrayList<Integer>> distanceMatrix;
     private final int timeConstraint;
-    private static final int DEPOT = 0;
 
 
     private FitnessEvaluator(ArrayList<ArrayList<Integer>> distanceMatrix, int timeConstraint) {

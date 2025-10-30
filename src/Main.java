@@ -3,6 +3,7 @@ import Chromosomes.FloatingPointChromosome;
 import Crossover.*;
 import Fitness.*;
 import Selection.*;
+import Replacement.*;
 
 import java.util.*;
 
@@ -145,15 +146,19 @@ public class Main {
         System.out.println("3 - Elitist (Keep best individuals)");
         int replaceChoice = getIntInput(sc, defaultReplaceChoice);
 
+        ReplacementStrategy replacementStrategy;
         if (replaceChoice == 1) {
+            replacementStrategy = new GenerationalReplacement();
             System.out.println("Generational replacement selected");
         } else if (replaceChoice == 2) {
             System.out.println("Enter K, number of parents to replace (default: " + defaultK + "):");
             int k = getIntInput(sc, defaultK);
+            replacementStrategy = new SteadyStateReplacement(k);
             System.out.println("Steady-state replacement selected (K=" + k + ")");
         } else {
             System.out.println("Enter number of elite individuals (default: " + defaultEliteCount + "):");
             int eliteCount = getIntInput(sc, defaultEliteCount);
+            replacementStrategy = new ElitistReplacement(eliteCount);
             System.out.println("Elitist replacement selected (elite count=" + eliteCount + ")");
         }
 
@@ -241,23 +246,20 @@ public class Main {
         List<Integer> generationStats = new ArrayList<>();
 
         for (int gen = 0; gen < generations; gen++) {
-            List<Chromosome> newPopulation = new ArrayList<>();
-
-            // Elite preservation - keep best individual
-            Chromosome best = findBest(population);
-            newPopulation.add(best.clone());
+            List<Chromosome> offspring = new ArrayList<>();
 
             // Show detailed operations for first few generations
             boolean showDetails = (gen < 3) || (gen + 1) % 10 == 0 || gen == generations - 1;
 
             if (showDetails) {
                 System.out.println("\n--- GENERATION " + (gen + 1) + " OPERATIONS ---");
-                System.out.println("Elite preserved: " + best.getDeliverySequence() + " (Fitness: " + best.getFitness() + ")");
+                Chromosome best = findBest(population);
+                System.out.println("Current best: " + best.getDeliverySequence() + " (Fitness: " + best.getFitness() + ")");
             }
 
             int operationCount = 0;
-            // Create new population through selection, crossover, and mutation
-            while (newPopulation.size() < popSize) {
+            // Create offspring through selection, crossover, and mutation
+            while (offspring.size() < popSize) {
                 // Selection phase
                 Chromosome parent1 = selection.select(population);
                 Chromosome parent2 = selection.select(population);
@@ -310,18 +312,19 @@ public class Main {
                         System.out.println("      Delivery Sequence: " + child.getDeliverySequence());
                         System.out.println("      Fitness: " + child.getFitness());
                     }
-                    newPopulation.add(child);
-                    if (newPopulation.size() >= popSize) break;
+                    offspring.add(child);
+                    if (offspring.size() >= popSize) break;
                 }
 
                 operationCount++;
                 if (showDetails && operationCount >= 3) {
-                    System.out.println("  ... (showing first 3 operations, continuing with " + (popSize - newPopulation.size()) + " more operations)");
+                    System.out.println("  ... (showing first 3 operations, continuing with " + (popSize - offspring.size()) + " more operations)");
                     showDetails = false; // Stop showing details for this generation
                 }
             }
 
-            population = newPopulation;
+            // Apply replacement strategy
+            population = replacementStrategy.replace(population, offspring);
 
             // Track best solution
             Chromosome currentBest = findBest(population);
@@ -372,6 +375,7 @@ public class Main {
         System.out.println("Crossover Probability: " + crossoverProb);
         System.out.println("Mutation Probability: " + mutationProb);
         System.out.println("Selection Method: " + (selType == 1 ? "Tournament" : "Roulette Wheel"));
+        System.out.println("Replacement Strategy: " + replacementStrategy.toString());
 
         System.out.println("\n=== FINAL ALGORITHM DEMONSTRATION ===");
         System.out.println("Demonstrating the complete genetic algorithm workflow:");
