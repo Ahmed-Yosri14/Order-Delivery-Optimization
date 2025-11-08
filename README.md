@@ -12,36 +12,36 @@ The library follows a modular architecture with clear separation of concerns:
 
 ```
 src/
-├── Chromosomes/           # Different chromosome representations
+├── GeneticAlgorithm.Chromosomes/           # Different chromosome representations
 │   ├── Chromosome.java           (Interface)
 │   ├── BinaryChromosome.java
 │   ├── IntegerChromosome.java
 │   └── FloatingPointChromosome.java
-├── Selection/             # Selection strategies
-│   ├── Selection.java             (Interface)
+├── GeneticAlgorithm.Selection/             # GeneticAlgorithm.Selection strategies
+│   ├── GeneticAlgorithm.Selection.java             (Interface)
 │   ├── TournamentSelection.java
 │   └── RouletteWheelSelection.java
-├── Crossover/             # Crossover operators
-│   ├── Crossover.java             (Interface)
+├── GeneticAlgorithm.Crossover/             # GeneticAlgorithm.Crossover operators
+│   ├── GeneticAlgorithm.Crossover.java             (Interface)
 │   ├── OrderOneCrossover.java
 │   ├── IntegerCrossover.java
 │   └── FloatingPointUniformCrossover.java
-├── Replacement/           # Replacement strategies
+├── GeneticAlgorithm.Replacement/           # GeneticAlgorithm.Replacement strategies
 │   ├── ReplacementStrategy.java   (Interface)
 │   ├── GenerationalReplacement.java
 │   ├── SteadyStateReplacement.java
 │   └── ElitistReplacement.java
-├── Fitness/               # Fitness evaluation (problem-dependent)
+├── GeneticAlgorithm.Fitness/               # GeneticAlgorithm.Fitness evaluation (problem-dependent)
 │   ├── FitnessEvaluator.java      (Interface)
 │   ├── BinaryFitnessEvaluator.java
 │   ├── IntegerFitnessEvaluator.java
 │   └── FloatingPointFitnessEvaluator.java
-├── Helpers/               # Utility classes
+├── GeneticAlgorithm.Helpers/               # Utility classes
 │   └── Pair.java
-├── GeneticAlgorithm.java  # Main GA engine (configurable)
-├── Initializer.java       # Population initialization
-├── CaseStudyDemo.java     # Simple demonstration following template
-└── Main.java              # Interactive comprehensive demo
+├── GeneticAlgorithm.GeneticAlgorithm.java  # GeneticAlgorithm.Main GA engine (configurable)
+├── GeneticAlgorithm.Initializer.java       # Population initialization
+├── GeneticAlgorithm.CaseStudyDemo.java     # Simple demonstration following template
+└── GeneticAlgorithm.Main.java              # Interactive comprehensive demo
 ```
 
 ## ✨ Features
@@ -51,14 +51,14 @@ src/
 - **Integer Chromosome**: Direct sequence representation
 - **Floating Point Chromosome**: Continuous value representation
 
-### 2. Selection Methods
-- **Tournament Selection**: Configurable tournament size
-- **Roulette Wheel Selection**: Fitness-proportionate selection
+### 2. GeneticAlgorithm.Selection Methods
+- **Tournament GeneticAlgorithm.Selection**: Configurable tournament size
+- **Roulette Wheel GeneticAlgorithm.Selection**: GeneticAlgorithm.Fitness-proportionate selection
 
-### 3. Crossover Operators
-- **Order-One Crossover (OX1)**: For binary chromosomes
-- **Integer Crossover**: Preserves permutation validity
-- **Floating Point Uniform Crossover**: Random gene swapping
+### 3. GeneticAlgorithm.Crossover Operators
+- **Order-One GeneticAlgorithm.Crossover (OX1)**: For binary chromosomes
+- **Integer GeneticAlgorithm.Crossover**: Preserves permutation validity
+- **Floating Point Uniform GeneticAlgorithm.Crossover**: Random gene swapping
 
 ### 4. Mutation Methods
 Each chromosome type implements 1-2 mutation methods:
@@ -66,10 +66,10 @@ Each chromosome type implements 1-2 mutation methods:
 - **Integer**: Swap mutation, "become last" mutation
 - **Floating Point**: Uniform mutation, non-uniform mutation
 
-### 5. Replacement Strategies
-- **Generational Replacement**: Complete population replacement
-- **Steady-State Replacement**: K parents replaced by K offspring
-- **Elitist Replacement**: Preserve best individuals across generations
+### 5. GeneticAlgorithm.Replacement Strategies
+- **Generational GeneticAlgorithm.Replacement**: Complete population replacement
+- **Steady-State GeneticAlgorithm.Replacement**: K parents replaced by K offspring
+- **Elitist GeneticAlgorithm.Replacement**: Preserve best individuals across generations
 
 ### 6. Infeasibility Handling
 The fitness evaluation considers time constraints and only counts deliveries that can be completed within the limit.
@@ -79,6 +79,8 @@ The fitness evaluation considers time constraints and only counts deliveries tha
 ### Using the Library (Simple Approach)
 
 ```java
+import GeneticAlgorithm.GeneticAlgorithm;
+
 import java.util.ArrayList;
 
 public class MyApplication {
@@ -86,11 +88,11 @@ public class MyApplication {
         // 1. Setup your problem
         ArrayList<ArrayList<Integer>> distanceMatrix = /* your data */;
         int timeConstraint = 200;
-        
+
         // 2. Initialize fitness evaluator
         IntegerFitnessEvaluator.getInstance(distanceMatrix, timeConstraint);
         FitnessEvaluator fitnessFunction = IntegerFitnessEvaluator.getInstance();
-        
+
         // 3. Configure GA
         GeneticAlgorithm ga = new GeneticAlgorithm();
         ga.setPopulationSize(50);
@@ -100,14 +102,14 @@ public class MyApplication {
         ga.setCrossoverRate(0.7);
         ga.setMutationRate(0.02);
         ga.setGenerations(100);
-        
+
         // 4. Run
         ga.run();
-        
+
         // 5. Get results
         Chromosome bestSolution = ga.getBestSolution();
         System.out.println("Best Solution: " + bestSolution.getDeliverySequence());
-        System.out.println("Fitness: " + bestSolution.getFitness());
+        System.out.println("GeneticAlgorithm.Fitness: " + bestSolution.getFitness());
     }
 }
 ```
@@ -126,16 +128,16 @@ A delivery company needs to optimize the sequence of delivering orders to multip
 
 #### Option 1: Simple Demo (Follows Template)
 ```bash
-javac src/CaseStudyDemo.java
-java -cp src CaseStudyDemo
+javac src/GeneticAlgorithm.CaseStudyDemo.java
+java -cp src GeneticAlgorithm.CaseStudyDemo
 ```
 
 This runs a preset demonstration showing how to use the library with fixed parameters.
 
 #### Option 2: Interactive Mode (Full Control)
 ```bash
-javac src/Main.java
-java -cp src Main
+javac src/GeneticAlgorithm.Main.java
+java -cp src GeneticAlgorithm.Main
 ```
 
 This provides an interactive interface where you can:
@@ -150,9 +152,9 @@ This provides an interactive interface where you can:
 - Demonstrates all 8 phases of GA:
   1. Problem Setup
   2. Initialization
-  3. Fitness Evaluation
-  4. Selection Method
-  5. Crossover Operators
+  3. GeneticAlgorithm.Fitness Evaluation
+  4. GeneticAlgorithm.Selection Method
+  5. GeneticAlgorithm.Crossover Operators
   6. Mutation Operators
   7. Evolutionary Loop
   8. Results Analysis
@@ -164,10 +166,10 @@ This provides an interactive interface where you can:
 Population Size: 50
 Chromosome Length: 10
 Generations: 100
-Crossover Rate: 0.7
+GeneticAlgorithm.Crossover Rate: 0.7
 Mutation Rate: 0.01
-Selection: Tournament (size=3)
-Replacement: Elitist (elite count=1)
+GeneticAlgorithm.Selection: Tournament (size=3)
+GeneticAlgorithm.Replacement: Elitist (elite count=1)
 ```
 
 ### Customizable Parameters
@@ -177,8 +179,8 @@ All parameters can be configured through setter methods:
 - `setGenerations(int)`
 - `setCrossoverRate(double)`
 - `setMutationRate(double)`
-- `setSelectionMethod(Selection)`
-- `setCrossoverOperator(Crossover)`
+- `setSelectionMethod(GeneticAlgorithm.Selection)`
+- `setCrossoverOperator(GeneticAlgorithm.Crossover)`
 - `setReplacementStrategy(ReplacementStrategy)`
 
 ## 📝 Testing
@@ -195,7 +197,7 @@ This implementation follows clean code principles:
 
 1. **Interface-based Design**: All major components use interfaces for flexibility
 2. **Separation of Concerns**: Each class has a single responsibility
-3. **Problem-Dependent Interfaces**: Fitness evaluation uses interfaces for different problems
+3. **Problem-Dependent Interfaces**: GeneticAlgorithm.Fitness evaluation uses interfaces for different problems
 4. **No Over-commenting**: Comments only where necessary for complex logic
 5. **Meaningful Names**: Classes, methods, and variables have descriptive names
 6. **Modular Architecture**: Components can be easily replaced or extended
@@ -206,7 +208,7 @@ The library provides comprehensive statistics:
 - Best fitness achieved
 - Best solution (delivery sequence)
 - Total route time
-- Fitness evolution over generations
+- GeneticAlgorithm.Fitness evolution over generations
 - Average, maximum, minimum fitness
 - Convergence analysis
 
@@ -223,18 +225,18 @@ The library provides comprehensive statistics:
 4. **Case Study**: Delivery optimization with time constraints
 
 ### Demo Flow:
-1. Show CaseStudyDemo.java (simple library usage)
-2. Run interactive Main.java (comprehensive demonstration)
+1. Show GeneticAlgorithm.CaseStudyDemo.java (simple library usage)
+2. Run interactive GeneticAlgorithm.Main.java (comprehensive demonstration)
 3. Explain key design decisions
 4. Show test results
 
 ## 📄 Requirements Compliance
 
 ✅ 3 Chromosome types (Binary, Integer, Floating Point)  
-✅ 2+ Selection methods (Tournament, Roulette Wheel)  
-✅ 3+ Crossover methods (OrderOne, Integer, FP Uniform)  
+✅ 2+ GeneticAlgorithm.Selection methods (Tournament, Roulette Wheel)  
+✅ 3+ GeneticAlgorithm.Crossover methods (OrderOne, Integer, FP Uniform)  
 ✅ 1-2 Mutation methods per chromosome type  
-✅ 3 Replacement strategies (Generational, Steady-State, Elitist)  
+✅ 3 GeneticAlgorithm.Replacement strategies (Generational, Steady-State, Elitist)  
 ✅ Infeasibility handling (time constraint checking)  
 ✅ Default values with override capability  
 ✅ Clean code architecture  
