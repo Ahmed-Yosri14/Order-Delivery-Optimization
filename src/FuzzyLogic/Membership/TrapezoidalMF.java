@@ -12,8 +12,10 @@ public class TrapezoidalMF implements MembershipFunction {
     
     @Override
     public double getMembership(double x) {
-        // implement
-        return 0.0;
+        if (x <= leftBase || x >= rightBase) return 0.0;
+        else if (x >= leftPeak && x <= rightPeak) return 1.0;
+        else if (x > leftBase && x < leftPeak) return (x - leftBase) / (leftPeak - leftBase);
+        else return (rightBase - x) / (rightBase - rightPeak);
     }
 
 }

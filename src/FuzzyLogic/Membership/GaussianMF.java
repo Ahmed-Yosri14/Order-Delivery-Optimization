@@ -10,8 +10,7 @@ public class GaussianMF implements MembershipFunction {
 
     @Override
     public double getMembership(double x) {
-        // implement
-        return 0.0;
+        return Math.exp(-Math.pow(x - center, 2) / (2 * sigma * sigma));
     }
 
 }

@@ -9,10 +9,14 @@ public class TriangularMF implements MembershipFunction {
         this.right = right;
     }
 
+
+
     @Override
-    public double getMembership(double x) {
-        // implement
-        return 0.0;
+    public double getMembership(double value) {
+        if (value <= left|| value >= peak) return 0.0;
+        else if (value == right) return 1.0;
+        else if (value > left && value < right) return (value - left) / (right - left);
+        else return (peak - value) / (peak - right);
     }
 
 }
