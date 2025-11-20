@@ -2,7 +2,7 @@ package FuzzyLogic.Membership;
 
 public class TriangularMF implements MembershipFunction {
     private double left, peak, right;
-    
+
     public TriangularMF(double left, double peak, double right) {
         this.left = left;
         this.peak = peak;
@@ -10,13 +10,23 @@ public class TriangularMF implements MembershipFunction {
     }
 
 
-
     @Override
     public double getMembership(double value) {
-        if (value <= left|| value >= peak) return 0.0;
-        else if (value == right) return 1.0;
-        else if (value > left && value < right) return (value - left) / (right - left);
-        else return (peak - value) / (peak - right);
-    }
+        // Peak must be checked first (handles left/right-angled triangles)
+        if (value == peak)
+            return 1.0;
 
+        if (value <= left || value >= right)
+            return 0.0;
+
+        // Rising slope
+        if (value > left && value < peak)
+            return (value - left) / (peak - left);
+
+        // Falling slope
+        if (value > peak && value < right)
+            return (right - value) / (right - peak);
+
+        return 0.0;
+    }
 }
