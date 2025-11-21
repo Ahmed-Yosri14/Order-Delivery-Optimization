@@ -11,8 +11,12 @@ public class RainForecast extends FuzzyVariable<RainForecastClass> {
 
     @Override
     protected void defineMembershipFunctions() {
-        sets.put(RainForecastClass.NONE, new TrapezoidalMF(0, 0, 1, 2));
-        sets.put(RainForecastClass.LIGHT, new TrapezoidalMF(1, 3, 5, 7));
-        sets.put(RainForecastClass.HEAVY, new TrapezoidalMF(5, 8, 10, 10));
+        sets.put(RainForecastClass.NONE, new TrapezoidalMF(0, 0, 0.5, 1.5));
+        sets.put(RainForecastClass.LIGHT, new TrapezoidalMF(0.8, 1.5, 3.5, 4.5));
+        sets.put(RainForecastClass.HEAVY, new TrapezoidalMF(3.5, 5, 10, 10));
+    }
+
+    protected void getCentroid() {
+
     }
 }

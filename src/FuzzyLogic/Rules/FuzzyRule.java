@@ -1,36 +1,43 @@
 package FuzzyLogic.Rules;
 
+import FuzzyLogic.Variable.FuzzyVariable;
 import FuzzyLogic.Operators.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a complete fuzzy rule with antecedents (IF part) and consequent (THEN part).
  * Example: IF Soil is Dry AND Temperature is Hot THEN Water Duration is Long
  */
 public class FuzzyRule {
-    private final List<FuzzyCondition<?>> antecedents;
-    private final String logicOperator; // "AND" or "OR"
-    private final FuzzyConsequent<?> consequent;
+    private List<FuzzyCondition> antecedents;
+    private String logicOperator; // "AND" or "OR"
+    private FuzzyConsequent consequent;
     private double weight;
     private double firingStrength;
 
     private LogicalOperator andOperator;
     private LogicalOperator orOperator;
 
-    public FuzzyRule(String logicOperator, FuzzyConsequent<?> consequent) {
+    /**
+     * Constructor with default settings
+     *
+     * @param logicOperator "AND" or "OR" to combine antecedents
+     * @param consequent    the THEN part of the rule
+     */
+    public FuzzyRule(String logicOperator, FuzzyConsequent consequent) {
         this.antecedents = new ArrayList<>();
         this.logicOperator = logicOperator.toUpperCase();
         this.consequent = consequent;
         this.weight = 1.0;
         this.firingStrength = 0.0;
-        // Default operators
-        this.andOperator = new AndMin();
-        this.orOperator = new OrMax();
+        this.andOperator = new And();
+        this.orOperator = new Or();
     }
 
-    public FuzzyRule(String logicOperator, FuzzyConsequent<?> consequent,
+    public FuzzyRule(String logicOperator, FuzzyConsequent consequent,
                      LogicalOperator andOperator, LogicalOperator orOperator) {
         this(logicOperator, consequent);
         this.andOperator = andOperator;
@@ -39,13 +46,13 @@ public class FuzzyRule {
 
 
     // Add a condition to the antecedents
-    public void addAntecedent(FuzzyCondition<?> condition) {
+    public void addAntecedent(FuzzyCondition condition) {
         antecedents.add(condition);
     }
 
 
     // Evaluate the rule by computing the firing strength
-    public double evaluate() {
+    public double evaluate(Map<String, FuzzyVariable> inputs) {
 
         if (antecedents.isEmpty()) {
             firingStrength = 0.0;
@@ -54,8 +61,15 @@ public class FuzzyRule {
 
         // Evaluate each condition
         List<Double> memberships = new ArrayList<>();
-        for (FuzzyCondition<?> condition : antecedents) {
-            double membership = condition.evaluate();
+        for (FuzzyCondition condition : antecedents) {
+            FuzzyVariable override = null;
+            if (inputs != null) {
+                String varName = condition.getVariable().getName();
+                if (inputs.containsKey(varName)) {
+                    override = inputs.get(varName);
+                }
+            }
+            double membership = condition.evaluate(override);
             memberships.add(membership);
         }
 
@@ -95,7 +109,7 @@ public class FuzzyRule {
 
     // Getters and Setters
 
-    public List<FuzzyCondition<?>> getAntecedents() {
+    public List<FuzzyCondition> getAntecedents() {
         return antecedents;
     }
 
@@ -103,7 +117,7 @@ public class FuzzyRule {
         return logicOperator;
     }
 
-    public FuzzyConsequent<?> getConsequent() {
+    public FuzzyConsequent getConsequent() {
         return consequent;
     }
 
@@ -139,7 +153,7 @@ public class FuzzyRule {
         for (int i = 0; i < antecedents.size(); i++) {
             sb.append(antecedents.get(i).getVariable().getName())
                     .append(" is ")
-                    .append(antecedents.get(i).getLinguisticTerm().name());
+                    .append(antecedents.get(i).getLinguisticTerm());
 
             if (i < antecedents.size() - 1) {
                 sb.append(" ").append(logicOperator).append(" ");
@@ -154,4 +168,3 @@ public class FuzzyRule {
         return sb.toString();
     }
 }
-

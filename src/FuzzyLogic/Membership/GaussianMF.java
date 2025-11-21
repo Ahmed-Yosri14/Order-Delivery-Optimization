@@ -17,4 +17,9 @@ public class GaussianMF implements MembershipFunction {
         double diff = x - center;
         return Math.exp(-(diff * diff) / (2 * sigma * sigma));
     }
+
+    @Override
+    public double getCentroid() {
+        return center;
+    }
 }

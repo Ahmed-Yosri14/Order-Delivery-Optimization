@@ -10,8 +10,8 @@ public class WaterDuration extends FuzzyVariable<WaterDurationClass> {
 
     @Override
     protected void defineMembershipFunctions() {
-        sets.put(WaterDurationClass.SHORT, new TriangularMF(0, 0, 10));
-        sets.put(WaterDurationClass.MEDIUM, new TriangularMF(5, 15, 25));
-        sets.put(WaterDurationClass.LONG, new TriangularMF(20, 30, 30));
+        sets.put(WaterDurationClass.SHORT, new TriangularMF(0, 4, 8));
+        sets.put(WaterDurationClass.MEDIUM, new TriangularMF(6, 15, 24));
+        sets.put(WaterDurationClass.LONG, new TriangularMF(20, 27, 30));
     }
 }

@@ -1,14 +1,15 @@
 package FuzzyLogic.Rules;
 
 import FuzzyLogic.Variable.*;
-import FuzzyLogic.Variable.Enums.RainForecastClass;
-import FuzzyLogic.Variable.Enums.SoilMoistureClass;
-import FuzzyLogic.Variable.Enums.TemperatureClass;
-import FuzzyLogic.Variable.Enums.WaterDurationClass;
+import FuzzyLogic.Membership.MembershipFunction;
+import FuzzyLogic.Inference.SugenoInferenceEngine;
+import FuzzyLogic.Inference.MamdaniInferenceEngine;
 
-/**
- * Test class to verify Phase 2 implementation
- */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TestRuleSystem {
     public static void main(String[] args) {
         System.out.println("=== Testing Phase 2: Rule System Foundation ===\n");
@@ -20,67 +21,126 @@ public class TestRuleSystem {
         WaterDuration water = new WaterDuration();
 
         // Set input values
-        soil.setValue(25.0);  // Dry soil
-        temp.setValue(38.0);  // Hot temperature
-        rain.setValue(0.0);   // No rain
+        soil.setValue(50.0);  // Mid soil value so Dry/Normal/Wet overlap
+        temp.setValue(32.0);  // Warm/hot region
+        rain.setValue(6.0);   // Rain value that maps to Heavy/Light overlap
 
         System.out.println("Input Values:");
         System.out.println("  Soil Moisture: " + soil.getValue() + "%");
         System.out.println("  Temperature: " + temp.getValue() + "°C");
         System.out.println("  Rain Forecast: " + rain.getValue() + " mm\n");
 
-        // Test FuzzyCondition
-        System.out.println("--- Testing FuzzyCondition ---");
-        FuzzyCondition<SoilMoistureClass> cond1 = new FuzzyCondition<>(soil, SoilMoistureClass.DRY);
-        FuzzyCondition<TemperatureClass> cond2 = new FuzzyCondition<>(temp, TemperatureClass.HOT);
-        FuzzyCondition<RainForecastClass> cond3 = new FuzzyCondition<>(rain, RainForecastClass.NONE);
+        Map<String, FuzzyVariable> inputs = new HashMap<>();
+        inputs.put(soil.getName(), soil);
+        inputs.put(temp.getName(), temp);
+        inputs.put(rain.getName(), rain);
 
-        System.out.println("Evaluating conditions:");
-        System.out.println("  " + cond1.getVariable().getName() + " is " + cond1.getLinguisticTerm() + ": " + cond1.evaluate());
-        System.out.println("  " + cond2.getVariable().getName() + " is " + cond2.getLinguisticTerm() + ": " + cond2.evaluate());
-        System.out.println("  " + cond3.getVariable().getName() + " is " + cond3.getLinguisticTerm() + ": " + cond3.evaluate());
-        System.out.println();
+        System.out.println("--- Building duration rules and computing centroid-average crisp value ---");
 
-        // Test FuzzyConsequent (Fuzzy/Mamdani)
-        System.out.println("--- Testing FuzzyConsequent (Mamdani) ---");
-        FuzzyConsequent<WaterDurationClass> consequentFuzzy = new FuzzyConsequent<>(water, WaterDurationClass.LONG);
-        System.out.println("  Consequent: " + consequentFuzzy);
-        System.out.println("  Type: " + consequentFuzzy.getType());
-        System.out.println("  Is Fuzzy: " + consequentFuzzy.isFuzzy());
-        System.out.println();
+        FuzzyConsequent consShort = new FuzzyConsequent(water, "Short");
+        FuzzyConsequent consMedium = new FuzzyConsequent(water, "Medium");
+        FuzzyConsequent consLong = new FuzzyConsequent(water, "Long");
 
-        // Test FuzzyConsequent (Crisp/Sugeno)
-        System.out.println("--- Testing FuzzyConsequent (Sugeno) ---");
-        FuzzyConsequent<WaterDurationClass> consequentCrisp = new FuzzyConsequent<>(water, 25.0);
-        System.out.println("  Consequent: " + consequentCrisp);
-        System.out.println("  Type: " + consequentCrisp.getType());
-        System.out.println("  Is Crisp: " + consequentCrisp.isCrisp());
-        System.out.println();
+        FuzzyRule rShort = new FuzzyRule("OR", consShort);
+        rShort.addAntecedent(new FuzzyCondition(soil, "Wet"));
+        rShort.addAntecedent(new FuzzyCondition(rain, "Heavy"));
 
-        // Test FuzzyRule with AND
-        System.out.println("--- Testing FuzzyRule (AND logic) ---");
-        FuzzyRule rule1 = new FuzzyRule("AND", consequentFuzzy);
-        rule1.addAntecedent(new FuzzyCondition<>(soil, SoilMoistureClass.DRY));
-        rule1.addAntecedent(new FuzzyCondition<>(temp, TemperatureClass.HOT));
-        rule1.addAntecedent(new FuzzyCondition<>(rain, RainForecastClass.NONE));
+        FuzzyRule rMedium = new FuzzyRule("AND", consMedium);
+        rMedium.addAntecedent(new FuzzyCondition(soil, "Normal"));
 
-        double firingStrength = rule1.evaluate();
-        System.out.println("  Rule: " + rule1);
-        System.out.println("  Firing Strength: " + firingStrength);
-        System.out.println();
+        FuzzyRule rLong = new FuzzyRule("AND", consLong);
+        rLong.addAntecedent(new FuzzyCondition(soil, "Dry"));
+        rLong.addAntecedent(new FuzzyCondition(temp, "Hot"));
 
-        // Test FuzzyRule with OR
-        System.out.println("--- Testing FuzzyRule (OR logic) ---");
-        FuzzyConsequent<WaterDurationClass> shortWater = new FuzzyConsequent<>(water, WaterDurationClass.SHORT);
-        FuzzyRule rule2 = new FuzzyRule("OR", shortWater);
-        rule2.addAntecedent(new FuzzyCondition<>(soil, SoilMoistureClass.DRY));
-        rule2.addAntecedent(new FuzzyCondition<>(rain, RainForecastClass.HEAVY));
+        List<FuzzyRule> rules = new ArrayList<>();
+        rules.add(rShort);
+        rules.add(rMedium);
+        rules.add(rLong);
 
-        double firingStrength2 = rule2.evaluate();
-        System.out.println("  Rule: " + rule2);
-        System.out.println("  Firing Strength: " + firingStrength2);
-        System.out.println();
+        // Debug prints
+        debugEvaluateRule(rShort, inputs, "rShort");
+        debugEvaluateRule(rMedium, inputs, "rMedium");
+        debugEvaluateRule(rLong, inputs, "rLong");
 
+        // Run Sugeno engine
+        SugenoInferenceEngine sugeno = new SugenoInferenceEngine(inputs, rules);
+        double sugenoResult = sugeno.evaluate();
 
+        // Run Mamdani engine
+        MamdaniInferenceEngine mamdani = new MamdaniInferenceEngine(inputs, rules);
+        double mamdaniResult = mamdani.evaluate();
+
+        System.out.println("\nSummary:");
+        System.out.println("  Sugeno crisp output: " + String.format("%.3f", sugenoResult));
+        System.out.println("  Mamdani crisp output: " + String.format("%.3f", mamdaniResult));
+    }
+
+    // Debug helper: prints step-by-step antecedent membership values and combination steps
+    private static void debugEvaluateRule(FuzzyRule rule, Map<String, FuzzyVariable> inputs, String ruleName) {
+        System.out.println("\n[DEBUG] Evaluating rule: " + ruleName + " -> " + rule.getConsequent());
+        System.out.println("[DEBUG] Logic operator: " + rule.getLogicOperator());
+
+        double[] memberships = new double[rule.getAntecedents().size()];
+        for (int i = 0; i < rule.getAntecedents().size(); i++) {
+            FuzzyCondition cond = rule.getAntecedents().get(i);
+            String varName = cond.getVariable().getName();
+            String term = cond.getLinguisticTerm();
+
+            System.out.println("[DEBUG] Antecedent #" + (i + 1) + ": Variable='" + varName + "' RequestedTerm='" + term + "'");
+
+            // Print available labels for the variable
+            try {
+                Map<?, MembershipFunction> sets = cond.getVariable().getSets();
+                System.out.print("[DEBUG]   Available labels: ");
+                boolean first = true;
+                for (Object k : sets.keySet()) {
+                    if (!first) System.out.print(", ");
+                    System.out.print(k.toString());
+                    first = false;
+                }
+                System.out.println();
+            } catch (Exception ex) {
+                System.out.println("[DEBUG]   Could not read available labels: " + ex.getMessage());
+            }
+
+            // Try to get membership using the inputs map override if present
+            double value = 0.0;
+            try {
+                FuzzyVariable override = inputs.get(varName);
+                if (override != null) {
+                    value = override.getMembershipByName(term);
+                } else {
+                    value = cond.getVariable().getMembershipByName(term);
+                }
+                System.out.println("[DEBUG]   Membership for '" + term + "' = " + value);
+            } catch (Exception ex) {
+                System.out.println("[DEBUG]   ERROR computing membership for term '" + term + "' on var '" + varName + "': " + ex.getMessage());
+                value = 0.0;
+            }
+            memberships[i] = value;
+        }
+
+        // Combine memberships step by step
+        if (rule.getLogicOperator().equalsIgnoreCase("AND")) {
+            double acc = memberships.length > 0 ? memberships[0] : 0.0;
+            System.out.println("[DEBUG] Combining with AND (min): start=" + acc);
+            for (int i = 1; i < memberships.length; i++) {
+                double before = acc;
+                acc = Math.min(acc, memberships[i]);
+                System.out.println("[DEBUG]  min(" + before + ", " + memberships[i] + ") => " + acc);
+            }
+            System.out.println("[DEBUG] AND result = " + acc);
+        } else { // OR
+            double acc = memberships.length > 0 ? memberships[0] : 0.0;
+            System.out.println("[DEBUG] Combining with OR (max): start=" + acc);
+            for (int i = 1; i < memberships.length; i++) {
+                double before = acc;
+                acc = Math.max(acc, memberships[i]);
+                System.out.println("[DEBUG]  max(" + before + ", " + memberships[i] + ") => " + acc);
+            }
+            System.out.println("[DEBUG] OR result = " + acc);
+        }
+
+        System.out.println("[DEBUG] End of debug for rule: " + ruleName + "\n");
     }
 }

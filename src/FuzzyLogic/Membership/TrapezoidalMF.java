@@ -21,4 +21,9 @@ public class TrapezoidalMF implements MembershipFunction {
         else return (rightBase - x) / (rightBase - rightPeak); // Falling slope
     }
 
+    @Override
+    public double getCentroid() {
+        return (leftBase + leftPeak + rightPeak + rightBase) / 4.0;
+    }
+
 }

@@ -1,9 +1,9 @@
 package FuzzyLogic.Operators;
 
-public class OrSum implements LogicalOperator {
+public class Or implements LogicalOperator {
     @Override
     public double apply(double a, double b) {
-        return a + b - a * b;
+        return Math.max(a, b);
     }
 
 }
