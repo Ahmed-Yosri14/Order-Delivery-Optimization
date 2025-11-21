@@ -1,9 +1,10 @@
 package FuzzyLogic.Rules;
 
 import FuzzyLogic.Variable.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import FuzzyLogic.Variable.Enums.RainForecastClass;
+import FuzzyLogic.Variable.Enums.SoilMoistureClass;
+import FuzzyLogic.Variable.Enums.TemperatureClass;
+import FuzzyLogic.Variable.Enums.WaterDurationClass;
 
 /**
  * Test class to verify Phase 2 implementation
@@ -30,9 +31,9 @@ public class TestRuleSystem {
 
         // Test FuzzyCondition
         System.out.println("--- Testing FuzzyCondition ---");
-        FuzzyCondition cond1 = new FuzzyCondition(soil, "Dry");
-        FuzzyCondition cond2 = new FuzzyCondition(temp, "Hot");
-        FuzzyCondition cond3 = new FuzzyCondition(rain, "None");
+        FuzzyCondition<SoilMoistureClass> cond1 = new FuzzyCondition<>(soil, SoilMoistureClass.DRY);
+        FuzzyCondition<TemperatureClass> cond2 = new FuzzyCondition<>(temp, TemperatureClass.HOT);
+        FuzzyCondition<RainForecastClass> cond3 = new FuzzyCondition<>(rain, RainForecastClass.NONE);
 
         System.out.println("Evaluating conditions:");
         System.out.println("  " + cond1.getVariable().getName() + " is " + cond1.getLinguisticTerm() + ": " + cond1.evaluate());
@@ -42,7 +43,7 @@ public class TestRuleSystem {
 
         // Test FuzzyConsequent (Fuzzy/Mamdani)
         System.out.println("--- Testing FuzzyConsequent (Mamdani) ---");
-        FuzzyConsequent consequentFuzzy = new FuzzyConsequent(water, "Long");
+        FuzzyConsequent<WaterDurationClass> consequentFuzzy = new FuzzyConsequent<>(water, WaterDurationClass.LONG);
         System.out.println("  Consequent: " + consequentFuzzy);
         System.out.println("  Type: " + consequentFuzzy.getType());
         System.out.println("  Is Fuzzy: " + consequentFuzzy.isFuzzy());
@@ -50,7 +51,7 @@ public class TestRuleSystem {
 
         // Test FuzzyConsequent (Crisp/Sugeno)
         System.out.println("--- Testing FuzzyConsequent (Sugeno) ---");
-        FuzzyConsequent consequentCrisp = new FuzzyConsequent(water, 25.0);
+        FuzzyConsequent<WaterDurationClass> consequentCrisp = new FuzzyConsequent<>(water, 25.0);
         System.out.println("  Consequent: " + consequentCrisp);
         System.out.println("  Type: " + consequentCrisp.getType());
         System.out.println("  Is Crisp: " + consequentCrisp.isCrisp());
@@ -59,28 +60,23 @@ public class TestRuleSystem {
         // Test FuzzyRule with AND
         System.out.println("--- Testing FuzzyRule (AND logic) ---");
         FuzzyRule rule1 = new FuzzyRule("AND", consequentFuzzy);
-        rule1.addAntecedent(new FuzzyCondition(soil, "Dry"));
-        rule1.addAntecedent(new FuzzyCondition(temp, "Hot"));
-        rule1.addAntecedent(new FuzzyCondition(rain, "None"));
+        rule1.addAntecedent(new FuzzyCondition<>(soil, SoilMoistureClass.DRY));
+        rule1.addAntecedent(new FuzzyCondition<>(temp, TemperatureClass.HOT));
+        rule1.addAntecedent(new FuzzyCondition<>(rain, RainForecastClass.NONE));
 
-        Map<String, FuzzyVariable> inputs = new HashMap<>();
-        inputs.put(soil.getName(), soil);
-        inputs.put(temp.getName(), temp);
-        inputs.put(rain.getName(), rain);
-
-        double firingStrength = rule1.evaluate(inputs);
+        double firingStrength = rule1.evaluate();
         System.out.println("  Rule: " + rule1);
         System.out.println("  Firing Strength: " + firingStrength);
         System.out.println();
 
         // Test FuzzyRule with OR
         System.out.println("--- Testing FuzzyRule (OR logic) ---");
-        FuzzyConsequent shortWater = new FuzzyConsequent(water, "Short");
+        FuzzyConsequent<WaterDurationClass> shortWater = new FuzzyConsequent<>(water, WaterDurationClass.SHORT);
         FuzzyRule rule2 = new FuzzyRule("OR", shortWater);
-        rule2.addAntecedent(new FuzzyCondition(soil, "Dry"));
-        rule2.addAntecedent(new FuzzyCondition(rain, "Heavy"));
+        rule2.addAntecedent(new FuzzyCondition<>(soil, SoilMoistureClass.DRY));
+        rule2.addAntecedent(new FuzzyCondition<>(rain, RainForecastClass.HEAVY));
 
-        double firingStrength2 = rule2.evaluate(inputs);
+        double firingStrength2 = rule2.evaluate();
         System.out.println("  Rule: " + rule2);
         System.out.println("  Firing Strength: " + firingStrength2);
         System.out.println();

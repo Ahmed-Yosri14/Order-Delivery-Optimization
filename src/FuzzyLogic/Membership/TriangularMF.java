@@ -1,7 +1,9 @@
 package FuzzyLogic.Membership;
 
 public class TriangularMF implements MembershipFunction {
-    private double left, peak, right;
+    private final double left;
+    private final double peak;
+    private final double right;
 
     public TriangularMF(double left, double peak, double right) {
         this.left = left;

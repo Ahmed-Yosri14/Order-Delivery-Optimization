@@ -1,7 +1,8 @@
 package FuzzyLogic.Membership;
 
 public class GaussianMF implements MembershipFunction {
-    private double center, sigma;
+    private final double center;
+    private final double sigma;
 
     public GaussianMF(double center, double sigma) {
         if (sigma <= 0) {

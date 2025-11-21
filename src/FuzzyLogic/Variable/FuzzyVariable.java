@@ -1,19 +1,22 @@
 package FuzzyLogic.Variable;
 
 import FuzzyLogic.Membership.MembershipFunction;
-import java.util.*;
 
-public abstract class FuzzyVariable {
-    protected String name;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+
+public abstract class FuzzyVariable<T extends Enum<T>> {
+    protected final String name;
     protected double value;
-    protected Map<String, MembershipFunction> sets = new HashMap<>();
+    protected final EnumMap<T, MembershipFunction> sets;
 
-    public FuzzyVariable(String name) {
+    protected FuzzyVariable(String name, Class<T> domainClass) {
         this.name = name;
+        this.sets = new EnumMap<>(domainClass);
         defineMembershipFunctions();
     }
 
-    // Let subclasses define their own fuzzy sets
     protected abstract void defineMembershipFunctions();
 
     public void setValue(double value) {
@@ -24,23 +27,19 @@ public abstract class FuzzyVariable {
         return value;
     }
 
-    public double getMembership(String label) {
-        return sets.get(label).getMembership(value);
-    }
-
-    public Map<String, Double> fuzzify() {
-        Map<String, Double> memberships = new HashMap<>();
-        for (var e : sets.entrySet()) {
-            memberships.put(e.getKey(), e.getValue().getMembership(value));
+    public double getMembership(T label) {
+        MembershipFunction mf = sets.get(label);
+        if (mf == null) {
+            throw new IllegalArgumentException("Unknown linguistic term: " + label);
         }
-        return memberships;
+        return mf.getMembership(value);
     }
 
     public String getName() {
         return name;
     }
 
-    public Map<String, MembershipFunction> getSets() {
-        return sets;
+    public Map<T, MembershipFunction> getSets() {
+        return Collections.unmodifiableMap(sets);
     }
 }

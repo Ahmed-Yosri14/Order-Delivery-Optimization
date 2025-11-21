@@ -8,19 +8,19 @@ import FuzzyLogic.Variable.FuzzyVariable;
  * - FUZZY: For Mamdani inference (output variable + linguistic term)
  * - CRISP: For Sugeno inference (direct numeric value)
  */
-public class FuzzyConsequent {
+public class FuzzyConsequent<T extends Enum<T>> {
     public enum Type {
         FUZZY,  // Mamdani: "Water Duration is Long"
         CRISP   // Sugeno: "Water Duration = 20"
     }
 
-    private Type type;
-    private FuzzyVariable outputVariable;
-    private String linguisticTerm;
-    private double crispValue;
+    private final Type type;
+    private final FuzzyVariable<T> outputVariable;
+    private final T linguisticTerm;
+    private final double crispValue;
 
     // Constructor for Fuzzy (Mamdani) consequent
-    public FuzzyConsequent(FuzzyVariable outputVariable, String linguisticTerm) {
+    public FuzzyConsequent(FuzzyVariable<T> outputVariable, T linguisticTerm) {
         this.type = Type.FUZZY;
         this.outputVariable = outputVariable;
         this.linguisticTerm = linguisticTerm;
@@ -28,22 +28,32 @@ public class FuzzyConsequent {
     }
 
     // Constructor for Crisp (Sugeno) consequent
-    public FuzzyConsequent(FuzzyVariable outputVariable, double crispValue) {
+    public FuzzyConsequent(FuzzyVariable<T> outputVariable, double crispValue) {
         this.type = Type.CRISP;
         this.outputVariable = outputVariable;
         this.linguisticTerm = null;
         this.crispValue = crispValue;
     }
 
+    @Override
+    public String toString() {
+        if (type == Type.FUZZY) {
+            assert linguisticTerm != null;
+            return outputVariable.getName() + " is " + linguisticTerm.name();
+        } else {
+            return outputVariable.getName() + " = " + crispValue;
+        }
+    }
+
     public Type getType() {
         return type;
     }
 
-    public FuzzyVariable getOutputVariable() {
+    public FuzzyVariable<T> getOutputVariable() {
         return outputVariable;
     }
 
-    public String getLinguisticTerm() {
+    public T getLinguisticTerm() {
         return linguisticTerm;
     }
 
@@ -58,14 +68,4 @@ public class FuzzyConsequent {
     public boolean isCrisp() {
         return type == Type.CRISP;
     }
-
-    @Override
-    public String toString() {
-        if (type == Type.FUZZY) {
-            return outputVariable.getName() + " is " + linguisticTerm;
-        } else {
-            return outputVariable.getName() + " = " + crispValue;
-        }
-    }
 }
-

@@ -2,12 +2,12 @@ package FuzzyLogic.Rules;
 
 import FuzzyLogic.Variable.FuzzyVariable;
 
-public class FuzzyCondition {
-    private FuzzyVariable variable;
-    private String linguisticTerm;
+public class FuzzyCondition<T extends Enum<T>> {
+    private final FuzzyVariable<T> variable;
+    private final T linguisticTerm;
     private double membership;
 
-    public FuzzyCondition(FuzzyVariable variable, String linguisticTerm) {
+    public FuzzyCondition(FuzzyVariable<T> variable, T linguisticTerm) {
         this.variable = variable;
         this.linguisticTerm = linguisticTerm;
         this.membership = 0.0;
@@ -20,11 +20,11 @@ public class FuzzyCondition {
         return membership;
     }
 
-    public FuzzyVariable getVariable() {
+    public FuzzyVariable<T> getVariable() {
         return variable;
     }
 
-    public String getLinguisticTerm() {
+    public T getLinguisticTerm() {
         return linguisticTerm;
     }
 
@@ -34,6 +34,6 @@ public class FuzzyCondition {
 
     @Override
     public String toString() {
-        return variable.getName() + " is " + linguisticTerm + " (" + String.format("%.3f", membership) + ")";
+        return variable.getName() + " is " + linguisticTerm.name() + " (" + String.format("%.3f", membership) + ")";
     }
 }

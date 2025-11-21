@@ -1,7 +1,10 @@
 package FuzzyLogic.Membership;
 
 public class TrapezoidalMF implements MembershipFunction {
-    private double leftBase, leftPeak, rightPeak, rightBase;
+    private final double leftBase;
+    private final double leftPeak;
+    private final double rightPeak;
+    private final double rightBase;
 
     public TrapezoidalMF(double leftBase, double leftPeak, double rightPeak, double rightBase) {
         this.leftBase = leftBase;

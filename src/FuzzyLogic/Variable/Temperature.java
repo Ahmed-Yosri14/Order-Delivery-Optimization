@@ -1,16 +1,17 @@
 package FuzzyLogic.Variable;
 
 import FuzzyLogic.Membership.GaussianMF;
+import FuzzyLogic.Variable.Enums.TemperatureClass;
 
-public class Temperature extends FuzzyVariable {
+public class Temperature extends FuzzyVariable<TemperatureClass> {
     public Temperature() {
-        super("Temperature");
+        super("Temperature", TemperatureClass.class);
     }
 
     @Override
     protected void defineMembershipFunctions() {
-        sets.put("Cold", new GaussianMF(10, 5));
-        sets.put("Warm", new GaussianMF(25, 5));
-        sets.put("Hot", new GaussianMF(40, 5));
+        sets.put(TemperatureClass.COLD, new GaussianMF(10, 5));
+        sets.put(TemperatureClass.WARM, new GaussianMF(25, 5));
+        sets.put(TemperatureClass.HOT, new GaussianMF(40, 5));
     }
 }
