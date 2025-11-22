@@ -36,4 +36,9 @@ public class TriangularMF implements MembershipFunction {
     public double getCentroid() {
         return (left + peak + right) / 3.0;
     }
+
+    @Override
+    public double getMeanOfMaximum() {
+        return peak;
+    }
 }

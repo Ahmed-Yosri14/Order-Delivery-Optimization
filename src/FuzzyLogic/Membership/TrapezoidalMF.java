@@ -26,4 +26,9 @@ public class TrapezoidalMF implements MembershipFunction {
         return (leftBase + leftPeak + rightPeak + rightBase) / 4.0;
     }
 
+    @Override
+    public double getMeanOfMaximum() {
+        return (leftPeak + rightPeak) / 2.0;
+    }
+
 }

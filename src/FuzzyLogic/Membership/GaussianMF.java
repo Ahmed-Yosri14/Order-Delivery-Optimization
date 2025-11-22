@@ -22,4 +22,9 @@ public class GaussianMF implements MembershipFunction {
     public double getCentroid() {
         return center;
     }
+
+    @Override
+    public double getMeanOfMaximum() {
+        return center;
+    }
 }
