@@ -105,4 +105,20 @@ public abstract class FuzzyVariable<T extends Enum<T>> {
         }
         throw new IllegalArgumentException("Unknown linguistic term: " + labelName + " for variable: " + name);
     }
+
+    public MembershipFunction getMembershipFunction(String labelName) {
+        if (labelName == null) {
+            throw new IllegalArgumentException("Label name cannot be null");
+        }
+        for (T key : sets.keySet()) {
+            if (key.name().equalsIgnoreCase(labelName) || key.toString().equalsIgnoreCase(labelName)) {
+                MembershipFunction mf = sets.get(key);
+                if (mf == null) {
+                    throw new IllegalArgumentException("No MF for label " + labelName + " on variable " + name);
+                }
+                return mf;
+            }
+        }
+        throw new IllegalArgumentException("Unknown linguistic term: " + labelName + " for variable: " + name);
+    }
 }
