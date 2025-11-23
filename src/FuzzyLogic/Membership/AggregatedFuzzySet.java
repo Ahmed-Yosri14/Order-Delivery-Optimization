@@ -1,7 +1,6 @@
 package FuzzyLogic.Membership;
 
-import FuzzyLogic.Operators.AggregationOperator;
-import FuzzyLogic.Operators.ImplicationOperator;
+import FuzzyLogic.Operators.LogicalOperator;
 import FuzzyLogic.Operators.MaxAggregation;
 
 import java.util.ArrayList;
@@ -16,9 +15,9 @@ public class AggregatedFuzzySet {
     private static class ImpliedSet {
         MembershipFunction membershipFunction;
         double firingStrength;
-        ImplicationOperator implicationOperator;
+        LogicalOperator implicationOperator;
 
-        ImpliedSet(MembershipFunction mf, double firing, ImplicationOperator impl) {
+        ImpliedSet(MembershipFunction mf, double firing, LogicalOperator impl) {
             this.membershipFunction = mf;
             this.firingStrength = firing;
             this.implicationOperator = impl;
@@ -26,7 +25,7 @@ public class AggregatedFuzzySet {
     }
 
     private List<ImpliedSet> impliedSets;
-    private AggregationOperator aggregationOperator;
+    private LogicalOperator aggregationOperator;
     private double minDomain;
     private double maxDomain;
     private int resolution;
@@ -46,7 +45,7 @@ public class AggregatedFuzzySet {
      * Constructor with custom aggregation operator
      */
     public AggregatedFuzzySet(double minDomain, double maxDomain, int resolution,
-                              AggregationOperator aggregationOperator) {
+                              LogicalOperator aggregationOperator) {
         this(minDomain, maxDomain, resolution);
         this.aggregationOperator = aggregationOperator;
     }
@@ -55,7 +54,7 @@ public class AggregatedFuzzySet {
      * Add a rule's output (implied fuzzy set) to the aggregation
      */
     public void addImpliedSet(MembershipFunction mf, double firingStrength,
-                              ImplicationOperator implicationOperator) {
+                              LogicalOperator implicationOperator) {
         if (firingStrength > 0.0) {
             impliedSets.add(new ImpliedSet(mf, firingStrength, implicationOperator));
         }
@@ -150,7 +149,7 @@ public class AggregatedFuzzySet {
         return impliedSets.isEmpty();
     }
 
-    public void setAggregationOperator(AggregationOperator aggregationOperator) {
+    public void setAggregationOperator(LogicalOperator aggregationOperator) {
         this.aggregationOperator = aggregationOperator;
     }
 }
