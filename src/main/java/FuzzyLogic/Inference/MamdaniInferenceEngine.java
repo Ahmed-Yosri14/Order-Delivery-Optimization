@@ -24,8 +24,8 @@ public class MamdaniInferenceEngine {
     private final List<FuzzyRule> rules;
 
     // Configurable operators and methods
-    private ImplicationOperator implicationOperator;
-    private AggregationOperator aggregationOperator;
+    private LogicalOperator implicationOperator;
+    private LogicalOperator aggregationOperator;
     private DefuzzificationMethod defuzzificationMethod;
 
     // Domain parameters for aggregation
@@ -59,8 +59,8 @@ public class MamdaniInferenceEngine {
      */
     public MamdaniInferenceEngine(Map<String, FuzzyVariable> variables, List<FuzzyRule> rules,
                                   double outputMin, double outputMax, int resolution,
-                                  ImplicationOperator implicationOperator,
-                                  AggregationOperator aggregationOperator,
+                                  LogicalOperator implicationOperator,
+                                  LogicalOperator aggregationOperator,
                                   DefuzzificationMethod defuzzificationMethod) {
         this.variables = variables;
         this.rules = rules;
@@ -149,11 +149,11 @@ public class MamdaniInferenceEngine {
     }
 
     // Setters for configuration
-    public void setImplicationOperator(ImplicationOperator implicationOperator) {
+    public void setImplicationOperator(LogicalOperator implicationOperator) {
         this.implicationOperator = implicationOperator;
     }
 
-    public void setAggregationOperator(AggregationOperator aggregationOperator) {
+    public void setAggregationOperator(LogicalOperator aggregationOperator) {
         this.aggregationOperator = aggregationOperator;
     }
 
