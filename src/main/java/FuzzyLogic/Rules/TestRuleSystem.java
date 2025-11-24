@@ -67,14 +67,10 @@ public class TestRuleSystem {
             FuzzyRule fuzzyRule = RuleConverter.toFuzzyRule(doc, inputs);
 
             // Mamdani: fuzzy consequents only
-            if (isFuzzyClass(doc.output._class)) {
                 mamdaniRules.add(fuzzyRule);
-            }
 
             // Sugeno: crisp consequents only
-            if (isNumeric(doc.output._class)) {
                 sugenoRules.add(fuzzyRule);
-            }
         }
 
         if (mamdaniRules.isEmpty()) {
