@@ -1,8 +1,0 @@
-{
-  "rules": [
-    "IF SoilMoisture is Dry AND Temperature is Hot OR RainForecast is None THEN WaterDuration is Long",
-    "IF SoilMoisture is Wet OR RainForecast is Heavy THEN WaterDuration is Short",
-    "IF RainForecast is Light AND SoilMoisture is Normal THEN WaterDuration is Medium"
-  ]
-}
-
