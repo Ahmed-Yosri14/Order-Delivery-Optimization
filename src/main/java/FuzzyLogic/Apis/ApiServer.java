@@ -2,10 +2,13 @@ package FuzzyLogic.Apis;
 
 import static spark.Spark.*;
 import com.google.gson.Gson;
-
 import java.util.Map;
 
 public class ApiServer {
+
+    static class RuleRequest {
+        String rule;  // only field for POST/PUT
+    }
 
     public static void main(String[] args) {
 
@@ -15,38 +18,49 @@ public class ApiServer {
         RuleParser parser = new RuleParser();
         RuleRepository repo = new RuleRepository();
 
+
+        // CREATE RULE
         post("/rules", (req, res) -> {
             try {
-                RuleDocument doc = parser.parse(req.body());
-                return gson.toJson(repo.save(doc));
+                RuleRequest body = gson.fromJson(req.body(), RuleRequest.class);
+                RuleDocument doc = parser.parse(body.rule);
+                return repo.save(doc);
             } catch (Exception e) {
                 res.status(400);
-                return gson.toJson(Map.of("error", e.getMessage()));
+                return Map.of("error", e.getMessage());
             }
-        });
+        }, gson::toJson);
+
+        // UPDATE
         put("/rules/:id", (req, res) -> {
             try {
                 String id = req.params("id");
+                RuleRequest body = gson.fromJson(req.body(), RuleRequest.class);
 
-                RuleDocument updatedDoc = parser.parse(req.body());
-                updatedDoc.id = id;
+                RuleDocument updated = parser.parse(body.rule);
+                updated.id = id;
 
-                RuleDocument result = repo.update(id, updatedDoc);
-
-                return gson.toJson(result);
-
+                return repo.update(id, updated);
             } catch (Exception e) {
                 res.status(400);
-                return gson.toJson(Map.of("error", e.getMessage()));
+                return Map.of("error", e.getMessage());
             }
-        });
+        }, gson::toJson);
 
-        get("/rules", (req, res) -> gson.toJson(repo.findAll()));
+        // GET ALL
+        get("/rules",
+                (req, res) -> repo.findAll(),
+                gson::toJson
+        );
 
-        delete("/rules/:id", (req, res) -> {
-            repo.delete(req.params("id"));
-            return "Deleted";
-        });
+        // DELETE
+        delete("/rules/:id",
+                (req, res) -> {
+                    repo.delete(req.params("id"));
+                    return Map.of("status", "deleted");
+                },
+                gson::toJson
+        );
 
         System.out.println("Spark Java server running: http://localhost:8080");
     }

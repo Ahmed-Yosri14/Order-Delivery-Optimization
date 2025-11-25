@@ -7,7 +7,6 @@ public class RuleParser {
     private static final Map<String, Set<String>> VALID_CLASSES = new HashMap<>();
 
     public RuleParser() {
-        // Initialize valid enum classes (case-insensitive)
         VALID_CLASSES.put("SOIL MOISTURE", Set.of("DRY", "NORMAL", "WET"));
         VALID_CLASSES.put("TEMPERATURE", Set.of("COLD", "WARM", "HOT"));
         VALID_CLASSES.put("RAIN FORECAST", Set.of("NONE", "LIGHT", "HEAVY"));
@@ -42,6 +41,7 @@ public class RuleParser {
         // Parse conditions
         List<Condition> conditionList = new ArrayList<>();
         for (String c : conditions) {
+            // (?i) for case-insensitive \\s+ for spaces around 'is'
             String[] pair = c.split("(?i)\\s+is\\s+");
 
             if (pair.length != 2)
