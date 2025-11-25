@@ -10,7 +10,6 @@ import java.util.Map;
 public class RuleConverter {
 
     public static FuzzyRule toFuzzyRule(RuleDocument doc, Map<String, FuzzyVariable> vars) {
-        // Determine operator
         FuzzyConsequent consequent = new FuzzyConsequent(
                 (FuzzyVariable) vars.get(doc.output.variable),
                 doc.output._class

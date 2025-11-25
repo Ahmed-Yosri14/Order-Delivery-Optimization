@@ -7,16 +7,6 @@ import FuzzyLogic.Variable.FuzzyVariable;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Sugeno (Takagi-Sugeno-Kang) Inference Engine
- *
- * Supports:
- * - Zero-order: Consequents are crisp constants
- * - Can also handle fuzzy consequents (uses centroid as fallback)
- *
- * Output: Weighted average of consequents
- * Formula: Σ(firing_i × output_i) / Σ(firing_i)
- */
 public class SugenoInferenceEngine {
     private final Map<String, FuzzyVariable> variables;
     private final List<FuzzyRule> rules;
@@ -26,9 +16,6 @@ public class SugenoInferenceEngine {
         this.rules = rules;
     }
 
-    /**
-     * Evaluate the Sugeno fuzzy system
-     */
     public double evaluate() {
         System.out.println("\n=== Sugeno Inference Engine (Zero-Order) ===");
 
@@ -69,9 +56,6 @@ public class SugenoInferenceEngine {
         return crispOutput;
     }
 
-    /**
-     * Get intermediate firing strengths and consequent values for debugging
-     */
     public Map<FuzzyRule, Double> getFiringStrengths() {
         Map<FuzzyRule, Double> firingMap = new java.util.HashMap<>();
         for (FuzzyRule rule : rules) {

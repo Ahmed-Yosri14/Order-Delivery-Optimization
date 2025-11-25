@@ -7,10 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Represents a complete fuzzy rule with antecedents (IF part) and consequent (THEN part).
- * Example: IF Soil is Dry AND Temperature is Hot THEN Water Duration is Long
- */
 public class FuzzyRule {
     private List<FuzzyCondition> antecedents;
     private String logicOperator; // "AND" or "OR"
@@ -21,12 +17,6 @@ public class FuzzyRule {
     private LogicalOperator andOperator;
     private LogicalOperator orOperator;
 
-    /**
-     * Constructor with default settings
-     *
-     * @param logicOperator "AND" or "OR" to combine antecedents
-     * @param consequent    the THEN part of the rule
-     */
     public FuzzyRule(String logicOperator, FuzzyConsequent consequent) {
         this.antecedents = new ArrayList<>();
         this.logicOperator = logicOperator.toUpperCase();
@@ -107,7 +97,6 @@ public class FuzzyRule {
         return result;
     }
 
-    // Getters and Setters
 
     public List<FuzzyCondition> getAntecedents() {
         return antecedents;

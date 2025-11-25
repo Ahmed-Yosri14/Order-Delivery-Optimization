@@ -6,10 +6,6 @@ import FuzzyLogic.Operators.MaxAggregation;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents an aggregated fuzzy set combining multiple rule outputs.
- * This is the key component for TRUE Mamdani inference.
- */
 public class AggregatedFuzzySet {
 
     private static class ImpliedSet {

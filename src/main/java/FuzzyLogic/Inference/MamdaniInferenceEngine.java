@@ -10,36 +10,20 @@ import FuzzyLogic.Variable.FuzzyVariable;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TRUE Mamdani Inference Engine
- *
- * Process:
- * 1. Evaluate all rules (fuzzification + rule evaluation)
- * 2. Apply implication (MIN or PRODUCT) to each rule's output MF
- * 3. Aggregate all implied fuzzy sets (MAX or SUM)
- * 4. Defuzzify the aggregated fuzzy set (CENTROID or MOM)
- */
+
 public class MamdaniInferenceEngine {
     private final Map<String, FuzzyVariable> variables;
     private final List<FuzzyRule> rules;
 
-    // Configurable operators and methods
     private LogicalOperator implicationOperator;
     private LogicalOperator aggregationOperator;
     private DefuzzificationMethod defuzzificationMethod;
 
-    // Domain parameters for aggregation
     private double outputMin;
     private double outputMax;
     private int resolution;
 
-    /**
-     * Constructor with default settings:
-     * - MIN implication
-     * - MAX aggregation
-     * - CENTROID defuzzification
-     * - Resolution: 1000 points
-     */
+
     public MamdaniInferenceEngine(Map<String, FuzzyVariable> variables, List<FuzzyRule> rules,
                                   double outputMin, double outputMax) {
         this.variables = variables;
@@ -48,15 +32,11 @@ public class MamdaniInferenceEngine {
         this.outputMax = outputMax;
         this.resolution = 1000;
 
-        // Default operators
         this.implicationOperator = new MinImplication();
         this.aggregationOperator = new MaxAggregation();
         this.defuzzificationMethod = DefuzzificationMethod.CENTROID;
     }
 
-    /**
-     * Full constructor with all parameters
-     */
     public MamdaniInferenceEngine(Map<String, FuzzyVariable> variables, List<FuzzyRule> rules,
                                   double outputMin, double outputMax, int resolution,
                                   LogicalOperator implicationOperator,
@@ -72,9 +52,6 @@ public class MamdaniInferenceEngine {
         this.defuzzificationMethod = defuzzificationMethod;
     }
 
-    /**
-     * Evaluate the fuzzy system and return crisp output
-     */
     public double evaluate() {
         System.out.println("\n=== TRUE Mamdani Inference Engine ===");
         System.out.println("Implication: " + implicationOperator.getClass().getSimpleName());
@@ -127,7 +104,6 @@ public class MamdaniInferenceEngine {
         return crispOutput;
     }
 
-    // Getters for intermediate values (for debugging/visualization)
     public AggregatedFuzzySet getAggregatedSet() {
         AggregatedFuzzySet aggregatedSet = new AggregatedFuzzySet(
                 outputMin, outputMax, resolution, aggregationOperator
@@ -148,7 +124,6 @@ public class MamdaniInferenceEngine {
         return aggregatedSet;
     }
 
-    // Setters for configuration
     public void setImplicationOperator(LogicalOperator implicationOperator) {
         this.implicationOperator = implicationOperator;
     }
