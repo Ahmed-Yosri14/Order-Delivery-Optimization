@@ -7,6 +7,24 @@
 	"item": [
 		{
 			"name": "Get All Rules",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7cdd19e6-6a38-4684-920b-8dc7ca2b2b4d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"id": "40414565-fe7a0848-5744-4762-a3f2-cd42952e95e3",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -41,7 +59,12 @@
 						"id": "347c678f-d96b-4042-9c03-22d146782805",
 						"exec": [
 							"let json = pm.response.json();\r",
-							"pm.environment.set(\"rule_id\", json.id);"
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.collectionVariables.set(\"rule_id\", json.id);\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {},
@@ -55,7 +78,13 @@
 			},
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is Dry AND Temperature is Hot THEN Water Duration is Long\"\r\n}\r\n",
@@ -76,13 +105,35 @@
 		},
 		{
 			"name": "Edit a Rule",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7bd49cfa-9052-4717-8808-30d3d100796a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"id": "40414565-d39e3575-dec4-444a-8e50-3a4126213bf6",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
 			"request": {
 				"method": "PUT",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is Dry AND Temperature is Hot THEN Water Duration is Long\"\r\n}\r\n",
@@ -93,12 +144,18 @@
 					}
 				},
 				"url": {
-					"raw": "{{BaseURL}}/{{rule_id}}",
+					"raw": "{{BaseURL}}/:id",
 					"host": [
 						"{{BaseURL}}"
 					],
 					"path": [
-						"{{rule_id}}"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{rule_id}}"
+						}
 					]
 				}
 			},
@@ -106,6 +163,22 @@
 		},
 		{
 			"name": "Delete a Rule",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f8597351-36a3-4790-a52d-222f02ae8744",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"id": "40414565-b1a7d60e-b97c-4a8c-b510-6c02946bafec",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -123,12 +196,18 @@
 					}
 				},
 				"url": {
-					"raw": "{{BaseURL}}/{{rule_id}}",
+					"raw": "{{BaseURL}}/:id",
 					"host": [
 						"{{BaseURL}}"
 					],
 					"path": [
-						"{{rule_id}}"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{rule_id}}"
+						}
 					]
 				}
 			},
@@ -140,6 +219,10 @@
 			"key": "BaseURL",
 			"value": "",
 			"type": "default"
+		},
+		{
+			"key": "rule_id",
+			"value": ""
 		}
 	]
 }
