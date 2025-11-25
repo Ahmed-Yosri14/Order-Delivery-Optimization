@@ -152,6 +152,10 @@
 			"key": "BaseURL",
 			"value": "",
 			"type": "default"
+		},
+		{
+			"key": "rule_id",
+			"value": ""
 		}
 	]
 }
