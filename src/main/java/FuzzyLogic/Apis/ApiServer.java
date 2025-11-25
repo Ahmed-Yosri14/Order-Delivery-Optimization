@@ -20,7 +20,7 @@ public class ApiServer {
 
 
         // CREATE RULE
-        post("/rules", (req, res) -> {
+        post("/rules", "application/json", (req, res) -> {
             try {
                 RuleRequest body = gson.fromJson(req.body(), RuleRequest.class);
                 RuleDocument doc = parser.parse(body.rule);
@@ -32,7 +32,7 @@ public class ApiServer {
         }, gson::toJson);
 
         // UPDATE
-        put("/rules/:id", (req, res) -> {
+        put("/rules/:id", "application/json", (req, res) -> {
             try {
                 String id = req.params("id");
                 RuleRequest body = gson.fromJson(req.body(), RuleRequest.class);
@@ -48,13 +48,13 @@ public class ApiServer {
         }, gson::toJson);
 
         // GET ALL
-        get("/rules",
+        get("/rules", "application/json",
                 (req, res) -> repo.findAll(),
                 gson::toJson
         );
 
         // DELETE
-        delete("/rules/:id",
+        delete("/rules/:id", "application/json",
                 (req, res) -> {
                     repo.delete(req.params("id"));
                     return Map.of("status", "deleted");
