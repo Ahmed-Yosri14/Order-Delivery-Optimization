@@ -93,12 +93,18 @@
 					}
 				},
 				"url": {
-					"raw": "{{BaseURL}}/{{rule_id}}",
+					"raw": "{{BaseURL}}/:id",
 					"host": [
 						"{{BaseURL}}"
 					],
 					"path": [
-						"{{rule_id}}"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{rule_id}}"
+						}
 					]
 				}
 			},
@@ -123,12 +129,18 @@
 					}
 				},
 				"url": {
-					"raw": "{{BaseURL}}/{{rule_id}}",
+					"raw": "{{BaseURL}}/:id",
 					"host": [
 						"{{BaseURL}}"
 					],
 					"path": [
-						"{{rule_id}}"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{rule_id}}"
+						}
 					]
 				}
 			},
