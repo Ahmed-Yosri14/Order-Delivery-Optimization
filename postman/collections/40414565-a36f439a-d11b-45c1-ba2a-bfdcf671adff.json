@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "40414565-a36f439a-d11b-45c1-ba2a-bfdcf671adff",
+		"name": "Smart Irrigation Rule Based Apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Rules",
+			"id": "40414565-fe7a0848-5744-4762-a3f2-cd42952e95e3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}",
+					"host": [
+						"{{BaseURL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "347c678f-d96b-4042-9c03-22d146782805",
+						"exec": [
+							"let json = pm.response.json();\r",
+							"pm.environment.set(\"rule_id\", json.id);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"id": "40414565-9767015d-7f57-4263-acd2-fabb850c8676",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is Dry AND Temperature is Hot THEN Water Duration is Long\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}",
+					"host": [
+						"{{BaseURL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit a Rule",
+			"id": "40414565-d39e3575-dec4-444a-8e50-3a4126213bf6",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is Dry AND Temperature is Hot THEN Water Duration is Long\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/{{rule_id}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"{{rule_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a Rule",
+			"id": "40414565-b1a7d60e-b97c-4a8c-b510-6c02946bafec",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/{{rule_id}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"{{rule_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "BaseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
