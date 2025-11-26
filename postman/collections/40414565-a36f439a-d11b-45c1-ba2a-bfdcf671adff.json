@@ -87,7 +87,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is Dry AND Temperature is Hot THEN Water Duration is Long\"\r\n}\r\n",
+					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is DRY AND Temperature is HOT THEN Water Duration is LONG\",\r\n  \"weight\": 0.9\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -136,7 +136,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is Dry AND Temperature is Hot THEN Water Duration is Long\"\r\n}\r\n",
+					"raw": "{\r\n  \"rule\": \"IF Soil Moisture is DRY THEN Water Duration is LONG\",\r\n  \"weight\": 0.7\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
