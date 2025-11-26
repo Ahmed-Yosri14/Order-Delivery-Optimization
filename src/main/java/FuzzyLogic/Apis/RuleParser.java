@@ -23,11 +23,28 @@ public class RuleParser {
         // Case-insensitive split
         int thenIndex = text.toUpperCase().indexOf(" THEN ");
         if (thenIndex == -1 || !text.toUpperCase().startsWith("IF "))
-            throw new IllegalArgumentException("Rule must be in format: IF ... THEN ...");
+            throw new IllegalArgumentException("Rule must be in format: IF ... THEN ... [WEIGHT <value>]");
 
         // Extract parts
         String ifPart = text.substring(2, thenIndex).trim();    // remove 'IF'
         String thenPart = text.substring(thenIndex + 6).trim(); // remove 'THEN'
+
+        // Check for optional WEIGHT clause
+        double weight = 1.0; // default
+        int weightIndex = thenPart.toUpperCase().indexOf(" WEIGHT ");
+        if (weightIndex != -1) {
+            String weightStr = thenPart.substring(weightIndex + 8).trim();
+            thenPart = thenPart.substring(0, weightIndex).trim();
+
+            try {
+                weight = Double.parseDouble(weightStr);
+                if (weight < 0.0 || weight > 1.0) {
+                    throw new IllegalArgumentException("Weight must be between 0.0 and 1.0");
+                }
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid weight value: " + weightStr);
+            }
+        }
 
         // Detect operator
         boolean hasAnd = ifPart.toUpperCase().contains(" AND ");
@@ -80,6 +97,7 @@ public class RuleParser {
         doc.operator = operator;
         doc.conditions = conditionList;
         doc.output = output;
+        doc.weight = weight;
 
         return doc;
     }

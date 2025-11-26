@@ -54,4 +54,33 @@ public class RuleRepository {
     public void delete(String id) {
         collection.deleteOne(new Document("_id", new ObjectId(id)));
     }
+
+    public void disable(String id) {
+        collection.updateOne(
+                new Document("_id", new ObjectId(id)),
+                new Document("$set", new Document("enabled", false))
+        );
+    }
+
+    public void enable(String id) {
+        collection.updateOne(
+                new Document("_id", new ObjectId(id)),
+                new Document("$set", new Document("enabled", true))
+        );
+    }
+
+    public List<RuleDocument> findByEnabled(boolean enabled) {
+        List<RuleDocument> out = new ArrayList<>();
+        Gson gson = new Gson();
+        for (Document doc : collection.find(new Document("enabled", enabled))) {
+            RuleDocument rule = gson.fromJson(doc.toJson(), RuleDocument.class);
+            rule.id = doc.getObjectId("_id").toHexString();
+            out.add(rule);
+        }
+        return out;
+    }
+
+    public void hardDelete(String id) {
+        collection.deleteOne(new Document("_id", new ObjectId(id)));
+    }
 }

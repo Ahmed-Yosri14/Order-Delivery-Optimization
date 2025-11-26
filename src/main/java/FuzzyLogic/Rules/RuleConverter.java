@@ -11,7 +11,7 @@ public class RuleConverter {
 
     public static FuzzyRule toFuzzyRule(RuleDocument doc, Map<String, FuzzyVariable> vars) {
         FuzzyConsequent consequent = new FuzzyConsequent(
-                (FuzzyVariable) vars.get(doc.output.variable),
+                vars.get(doc.output.variable),
                 doc.output._class
         );
 
@@ -24,6 +24,9 @@ public class RuleConverter {
 
             rule.addAntecedent(new FuzzyCondition(var, c._class));
         }
+
+        // Apply weight from document to rule
+        rule.setWeight(doc.weight);
 
         return rule;
     }

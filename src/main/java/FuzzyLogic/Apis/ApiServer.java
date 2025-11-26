@@ -7,7 +7,8 @@ import java.util.Map;
 public class ApiServer {
 
     static class RuleRequest {
-        String rule;  // only field for POST/PUT
+        String rule;  // rule text in natural language format
+        Double weight; // optional: override weight (0.0-1.0)
     }
 
     public static void main(String[] args) {
@@ -24,6 +25,16 @@ public class ApiServer {
             try {
                 RuleRequest body = gson.fromJson(req.body(), RuleRequest.class);
                 RuleDocument doc = parser.parse(body.rule);
+
+                // If weight is provided in request body, override parsed weight
+                if (body.weight != null) {
+                    if (body.weight < 0.0 || body.weight > 1.0) {
+                        res.status(400);
+                        return Map.of("error", "Weight must be between 0.0 and 1.0");
+                    }
+                    doc.weight = body.weight;
+                }
+
                 return repo.save(doc);
             } catch (Exception e) {
                 res.status(400);
@@ -40,6 +51,15 @@ public class ApiServer {
                 RuleDocument updated = parser.parse(body.rule);
                 updated.id = id;
 
+                // If weight is provided in request body, override parsed weight
+                if (body.weight != null) {
+                    if (body.weight < 0.0 || body.weight > 1.0) {
+                        res.status(400);
+                        return Map.of("error", "Weight must be between 0.0 and 1.0");
+                    }
+                    updated.weight = body.weight;
+                }
+
                 return repo.update(id, updated);
             } catch (Exception e) {
                 res.status(400);
@@ -47,20 +67,45 @@ public class ApiServer {
             }
         }, gson::toJson);
 
-        // GET ALL
+        // GET ALL (optionally filter by enabled status)
         get("/rules", "application/json",
-                (req, res) -> repo.findAll(),
-                gson::toJson
-        );
-
-        // DELETE
-        delete("/rules/:id", "application/json",
                 (req, res) -> {
-                    repo.delete(req.params("id"));
-                    return Map.of("status", "deleted");
+                    String enabledParam = req.queryParams("enabled");
+                    if (enabledParam != null) {
+                        boolean enabled = Boolean.parseBoolean(enabledParam);
+                        return repo.findByEnabled(enabled);
+                    }
+                    return repo.findAll();
                 },
                 gson::toJson
         );
+
+        // GET ACTIVE RULES ONLY (enabled=true)
+        get("/rules/active", "application/json",
+                (req, res) -> repo.findByEnabled(true),
+                gson::toJson
+        );
+
+        // ENABLE RULE
+        patch("/rules/:id/enable", "application/json",
+                (req, res) -> {
+                    String id = req.params("id");
+                    repo.enable(id);
+                    return Map.of("status", "enabled", "message", "Rule has been enabled");
+                },
+                gson::toJson
+        );
+
+        // DISABLE RULE
+        patch("/rules/:id/disable", "application/json",
+                (req, res) -> {
+                    String id = req.params("id");
+                    repo.disable(id);
+                    return Map.of("status", "disabled", "message", "Rule has been disabled");
+                },
+                gson::toJson
+        );
+
 
         System.out.println("Spark Java server running: http://localhost:8080");
     }

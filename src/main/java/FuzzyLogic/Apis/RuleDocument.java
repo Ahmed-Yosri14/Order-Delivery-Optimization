@@ -7,4 +7,6 @@ public class RuleDocument {
     public String operator;
     public List<Condition> conditions;
     public Output output;
+    public double weight = 1.0;
+    public boolean enabled = true;
 }

@@ -50,11 +50,33 @@ public class TestRuleSystem {
         List<RuleDocument> documents = repo.findAll();
 
         if (documents.isEmpty()) {
-            System.out.println("❌ No rules found in MongoDB. Please insert rules first.");
+            System.out.println("No rules found in MongoDB. Please insert rules first.");
             return;
         }
 
-        System.out.println("Loaded " + documents.size() + " rule(s) from database.\n");
+        System.out.println("Loaded " + documents.size() + " rule(s) from database.");
+
+        // Filter only enabled rules
+        List<RuleDocument> enabledDocuments = new ArrayList<>();
+        int disabledCount = 0;
+        for (RuleDocument doc : documents) {
+            if (doc.enabled) {
+                enabledDocuments.add(doc);
+            } else {
+                disabledCount++;
+            }
+        }
+
+        System.out.println("Active (enabled) rules: " + enabledDocuments.size());
+        if (disabledCount > 0) {
+            System.out.println("Disabled rules (ignored): " + disabledCount);
+        }
+        System.out.println();
+
+        if (enabledDocuments.isEmpty()) {
+            System.out.println("No enabled rules found. All rules are disabled.");
+            return;
+        }
 
         // ---------------------------------------------------------
         // 3. Convert rule documents to FuzzyRule objects
@@ -63,7 +85,7 @@ public class TestRuleSystem {
         List<FuzzyRule> mamdaniRules = new ArrayList<>();
         List<FuzzyRule> sugenoRules = new ArrayList<>();
 
-        for (RuleDocument doc : documents) {
+        for (RuleDocument doc : enabledDocuments) {
             FuzzyRule fuzzyRule = RuleConverter.toFuzzyRule(doc, inputs);
 
             // Mamdani: fuzzy consequents only
