@@ -252,7 +252,7 @@
 			"response": []
 		},
 		{
-			"name": "Enable a Rule Copy",
+			"name": "Disable a Rule",
 			"id": "40414565-f1ef1e10-5b3a-4983-bb1f-3831bc5e1309",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
