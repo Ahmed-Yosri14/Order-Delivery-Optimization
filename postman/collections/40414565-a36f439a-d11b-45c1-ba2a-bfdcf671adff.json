@@ -271,17 +271,16 @@
 					"raw": "\r\n"
 				},
 				"url": {
-					"raw": "{{BaseURL}}/:id/enable",
+					"raw": "{{BaseURL}}/:id/disable",
 					"host": [
 						"{{BaseURL}}"
 					],
 					"path": [
 						":id",
-						"enable"
+						"disable"
 					],
 					"variable": [
 						{
-							"id": "c5da1db1-1280-476f-bed0-0dd242442c55",
 							"key": "id",
 							"value": "{{rule_id}}"
 						}
