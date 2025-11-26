@@ -220,8 +220,34 @@
 				"disableBodyPruning": true
 			},
 			"request": {
-				"method": "GET",
-				"header": []
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n"
+				},
+				"url": {
+					"raw": "{{BaseURL}}/:id/enable",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						":id",
+						"enable"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{rule_id}}"
+						}
+					]
+				}
 			},
 			"response": []
 		}
