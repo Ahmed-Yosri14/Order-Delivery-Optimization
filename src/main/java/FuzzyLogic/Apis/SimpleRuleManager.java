@@ -10,9 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-/**
- * Simple class to read and write rules from rules.json file
- */
+// Class to read and write rules from rules.json file
 public class SimpleRuleManager {
 
     private final String filePath;
@@ -27,9 +25,8 @@ public class SimpleRuleManager {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    /**
-     * Read all rules from JSON file and parse them into RuleDocument objects
-     */
+
+    // Read all rules from JSON file and parse them into RuleDocument objects
     public List<RuleDocument> loadRules() {
         List<SimpleRule> simpleRules = readSimpleRulesFromFile();
         List<RuleDocument> ruleDocuments = new ArrayList<>();
@@ -56,9 +53,8 @@ public class SimpleRuleManager {
         return ruleDocuments;
     }
 
-    /**
-     * Get only enabled rules
-     */
+
+    // Get only enabled rules
     public List<RuleDocument> loadEnabledRules() {
         List<RuleDocument> allRules = loadRules();
         List<RuleDocument> enabledRules = new ArrayList<>();
@@ -72,9 +68,8 @@ public class SimpleRuleManager {
         return enabledRules;
     }
 
-    /**
-     * Add a new rule to the JSON file
-     */
+
+    // Add a new rule to the JSON file
     public void addRule(String id, String ruleText, double weight, boolean enabled) {
         List<SimpleRule> rules = readSimpleRulesFromFile();
 
@@ -88,9 +83,8 @@ public class SimpleRuleManager {
         writeSimpleRulesToFile(rules);
     }
 
-    /**
-     * Update an existing rule
-     */
+
+    // Update an existing rule
     public boolean updateRule(String id, String newRuleText, Double newWeight, Boolean newEnabled) {
         List<SimpleRule> rules = readSimpleRulesFromFile();
 
@@ -107,23 +101,19 @@ public class SimpleRuleManager {
         return false; // Rule not found
     }
 
-    /**
-     * Enable a rule (soft delete alternative)
-     */
+    // Enable a rule (soft delete alternative)
     public boolean enableRule(String id) {
         return updateRule(id, null, null, true);
     }
 
-    /**
-     * Disable a rule (soft delete)
-     */
+
+    // Disable a rule (soft delete)
     public boolean disableRule(String id) {
         return updateRule(id, null, null, false);
     }
 
-    /**
-     * Delete a rule completely
-     */
+
+    //Delete a rule completely
     public boolean deleteRule(String id) {
         List<SimpleRule> rules = readSimpleRulesFromFile();
         boolean removed = rules.removeIf(rule -> rule.id.equals(id));
@@ -134,9 +124,8 @@ public class SimpleRuleManager {
         return removed;
     }
 
-    /**
-     * Get statistics about the rules
-     */
+
+    // Get statistics about the rules
     public RuleStats getStats() {
         List<SimpleRule> rules = readSimpleRulesFromFile();
         RuleStats stats = new RuleStats();
@@ -159,7 +148,8 @@ public class SimpleRuleManager {
                 return new ArrayList<>();
             }
 
-            Type listType = new TypeToken<List<SimpleRule>>(){}.getType();
+            Type listType = new TypeToken<List<SimpleRule>>() {
+            }.getType();
             List<SimpleRule> rules = gson.fromJson(content, listType);
             return rules != null ? rules : new ArrayList<>();
 

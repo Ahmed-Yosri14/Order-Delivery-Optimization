@@ -26,9 +26,8 @@ public class AggregatedFuzzySet {
     private double maxDomain;
     private int resolution;
 
-    /**
-     * Constructor with default MAX aggregation
-     */
+
+    //Constructor with default MAX aggregation
     public AggregatedFuzzySet(double minDomain, double maxDomain, int resolution) {
         this.impliedSets = new ArrayList<>();
         this.aggregationOperator = new MaxAggregation();
@@ -37,18 +36,16 @@ public class AggregatedFuzzySet {
         this.resolution = resolution;
     }
 
-    /**
-     * Constructor with custom aggregation operator
-     */
+
+    //Constructor with custom aggregation operator
     public AggregatedFuzzySet(double minDomain, double maxDomain, int resolution,
                               LogicalOperator aggregationOperator) {
         this(minDomain, maxDomain, resolution);
         this.aggregationOperator = aggregationOperator;
     }
 
-    /**
-     * Add a rule's output (implied fuzzy set) to the aggregation
-     */
+
+    //Add a rule's output (implied fuzzy set) to the aggregation
     public void addImpliedSet(MembershipFunction mf, double firingStrength,
                               LogicalOperator implicationOperator) {
         if (firingStrength > 0.0) {
@@ -56,9 +53,9 @@ public class AggregatedFuzzySet {
         }
     }
 
-    /**
-     * Get the aggregated membership value at a specific point
-     */
+
+    // Get the aggregated membership value at a specific point
+
     public double getMembershipAt(double x) {
         if (impliedSets.isEmpty()) {
             return 0.0;
@@ -83,9 +80,8 @@ public class AggregatedFuzzySet {
         return result;
     }
 
-    /**
-     * Calculate centroid of the aggregated fuzzy set
-     */
+
+    // Calculate centroid of the aggregated fuzzy set
     public double calculateCentroid() {
         if (impliedSets.isEmpty()) {
             return 0.0;
@@ -105,9 +101,8 @@ public class AggregatedFuzzySet {
         return (denominator == 0.0) ? (minDomain + maxDomain) / 2.0 : numerator / denominator;
     }
 
-    /**
-     * Calculate Mean of Maximum of the aggregated fuzzy set
-     */
+
+    // Calculate Mean of Maximum of the aggregated fuzzy set
     public double calculateMeanOfMaximum() {
         if (impliedSets.isEmpty()) {
             return 0.0;

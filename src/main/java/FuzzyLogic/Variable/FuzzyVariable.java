@@ -35,17 +35,6 @@ public abstract class FuzzyVariable<T extends Enum<T>> {
         return mf.getMembership(value);
     }
 
-    /**
-     * Get membership value for a specific x value (for defuzzification).
-     * Unlike getMembership(T), this evaluates the MF at position x instead of the stored value.
-     */
-    public double getMembership(T label, double x) {
-        MembershipFunction mf = sets.get(label);
-        if (mf == null) {
-            throw new IllegalArgumentException("Unknown linguistic term: " + label);
-        }
-        return mf.getMembership(x);
-    }
 
     public String getName() {
         return name;
