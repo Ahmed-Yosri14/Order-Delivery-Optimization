@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class FuzzyRule {
     private List<FuzzyCondition> antecedents;
-    private String logicOperator; // "AND" or "OR"
+    private String logicOperator; // "AND" or "OR" - for backward compatibility
+    private List<String> operatorSequence; // For mixed operators between conditions
     private FuzzyConsequent consequent;
     private double weight;
     private double firingStrength;
@@ -17,9 +18,23 @@ public class FuzzyRule {
     private LogicalOperator andOperator;
     private LogicalOperator orOperator;
 
+    // Constructor for single operator (backward compatibility)
     public FuzzyRule(String logicOperator, FuzzyConsequent consequent) {
         this.antecedents = new ArrayList<>();
         this.logicOperator = logicOperator.toUpperCase();
+        this.operatorSequence = null;
+        this.consequent = consequent;
+        this.weight = 1.0;
+        this.firingStrength = 0.0;
+        this.andOperator = new And();
+        this.orOperator = new Or();
+    }
+
+    // Constructor for mixed operators
+    public FuzzyRule(List<String> operatorSequence, FuzzyConsequent consequent) {
+        this.antecedents = new ArrayList<>();
+        this.logicOperator = null;
+        this.operatorSequence = new ArrayList<>(operatorSequence);
         this.consequent = consequent;
         this.weight = 1.0;
         this.firingStrength = 0.0;
@@ -30,6 +45,13 @@ public class FuzzyRule {
     public FuzzyRule(String logicOperator, FuzzyConsequent consequent,
                      LogicalOperator andOperator, LogicalOperator orOperator) {
         this(logicOperator, consequent);
+        this.andOperator = andOperator;
+        this.orOperator = orOperator;
+    }
+
+    public FuzzyRule(List<String> operatorSequence, FuzzyConsequent consequent,
+                     LogicalOperator andOperator, LogicalOperator orOperator) {
+        this(operatorSequence, consequent);
         this.andOperator = andOperator;
         this.orOperator = orOperator;
     }
@@ -63,19 +85,56 @@ public class FuzzyRule {
             memberships.add(membership);
         }
 
-        // Combine memberships based on logic operator
-        if (logicOperator.equals("AND")) {
-            firingStrength = combineWithAnd(memberships);
-        } else if (logicOperator.equals("OR")) {
-            firingStrength = combineWithOr(memberships);
+        // Combine memberships based on operator type
+        if (usesMixedOperators()) {
+            firingStrength = combineWithMixedOperators(memberships);
         } else {
-            throw new IllegalArgumentException("Invalid logic operator: " + logicOperator);
+            // Backward compatibility - single operator
+            if (logicOperator.equals("AND")) {
+                firingStrength = combineWithAnd(memberships);
+            } else if (logicOperator.equals("OR")) {
+                firingStrength = combineWithOr(memberships);
+            } else {
+                throw new IllegalArgumentException("Invalid logic operator: " + logicOperator);
+            }
         }
 
         // Apply rule weight
         firingStrength *= weight;
 
         return firingStrength;
+    }
+
+    // Check if this rule uses mixed operators
+    public boolean usesMixedOperators() {
+        return operatorSequence != null && !operatorSequence.isEmpty();
+    }
+
+    // Combine memberships using mixed operators in sequence
+    private double combineWithMixedOperators(List<Double> memberships) {
+        if (memberships.size() == 1) {
+            return memberships.get(0);
+        }
+
+        if (operatorSequence.size() != memberships.size() - 1) {
+            throw new IllegalStateException("Operator sequence length must be conditions length - 1");
+        }
+
+        double result = memberships.get(0);
+        for (int i = 0; i < operatorSequence.size(); i++) {
+            String operator = operatorSequence.get(i);
+            double nextMembership = memberships.get(i + 1);
+
+            if ("AND".equalsIgnoreCase(operator)) {
+                result = andOperator.apply(result, nextMembership);
+            } else if ("OR".equalsIgnoreCase(operator)) {
+                result = orOperator.apply(result, nextMembership);
+            } else {
+                throw new IllegalArgumentException("Invalid operator in sequence: " + operator);
+            }
+        }
+
+        return result;
     }
 
     // Combine memberships using AND operator (min)
@@ -104,6 +163,10 @@ public class FuzzyRule {
 
     public String getLogicOperator() {
         return logicOperator;
+    }
+
+    public List<String> getOperatorSequence() {
+        return operatorSequence != null ? new ArrayList<>(operatorSequence) : null;
     }
 
     public FuzzyConsequent getConsequent() {
@@ -140,12 +203,19 @@ public class FuzzyRule {
         sb.append("IF ");
 
         for (int i = 0; i < antecedents.size(); i++) {
-            sb.append(antecedents.get(i).getVariable().getName())
-                    .append(" is ")
-                    .append(antecedents.get(i).getLinguisticTerm());
+            FuzzyCondition condition = antecedents.get(i);
+            String prefix = condition.isNegated() ? "NOT " : "";
+            sb.append(condition.getVariable().getName())
+              .append(" is ")
+              .append(prefix)
+              .append(condition.getLinguisticTerm());
 
             if (i < antecedents.size() - 1) {
-                sb.append(" ").append(logicOperator).append(" ");
+                if (usesMixedOperators() && i < operatorSequence.size()) {
+                    sb.append(" ").append(operatorSequence.get(i)).append(" ");
+                } else {
+                    sb.append(" ").append(logicOperator).append(" ");
+                }
             }
         }
 

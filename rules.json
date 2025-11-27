@@ -1,0 +1,62 @@
+[
+  {
+    "id": "rule_001",
+    "ruleText": "IF Soil Moisture is DRY AND Temperature is HOT THEN Water Duration is LONG WEIGHT 1.0",
+    "weight": 1.0,
+    "enabled": true
+  },
+  {
+    "id": "rule_003",
+    "ruleText": "IF Soil Moisture is WET THEN Water Duration is SHORT WEIGHT 1.0",
+    "weight": 1.0,
+    "enabled": true
+  },
+  {
+    "id": "rule_004",
+    "ruleText": "IF Rain Forecast is HEAVY THEN Water Duration is SHORT WEIGHT 0.9",
+    "weight": 0.9,
+    "enabled": true
+  },
+  {
+    "id": "rule_005",
+    "ruleText": "IF Rain Forecast is LIGHT AND Soil Moisture is DRY THEN Water Duration is MEDIUM WEIGHT 0.7",
+    "weight": 0.7,
+    "enabled": true
+  },
+  {
+    "id": "rule_006",
+    "ruleText": "IF Temperature is WARM AND Soil Moisture is NORMAL OR Rain Forecast is LIGHT THEN Water Duration is MEDIUM WEIGHT 0.75",
+    "weight": 0.75,
+    "enabled": true
+  },
+  {
+    "id": "rule_007",
+    "ruleText": "IF Soil Moisture is DRY OR Temperature is HOT AND Rain Forecast is NONE THEN Water Duration is LONG WEIGHT 0.95",
+    "weight": 0.95,
+    "enabled": true
+  },
+  {
+    "id": "rule_008",
+    "ruleText": "IF Temperature is COLD OR Rain Forecast is HEAVY THEN Water Duration is SHORT WEIGHT 0.6",
+    "weight": 0.6,
+    "enabled": false
+  },
+  {
+    "id": "2",
+    "ruleText": "If Soil Moisture is Wet and Rain Forecast is Heavy or Temperature is Cold then Water Duration is Short",
+    "weight": 1.0,
+    "enabled": true
+  },
+  {
+    "id": "rule_009",
+    "ruleText": "IF Soil Moisture is NOT WET AND Rain Forecast is NONE THEN Water Duration is LONG WEIGHT 0.85",
+    "weight": 0.85,
+    "enabled": true
+  },
+  {
+    "id": "IF Soil Moisture is not Wet AND Rain Forecast is not Heavy OR Temperature is not Cold THEN Water Duration is not Short",
+    "ruleText": "IF Soil Moisture is not Wet AND Rain Forecast is not Heavy OR Temperature is not Cold THEN Water Duration is not Short",
+    "weight": 1.0,
+    "enabled": true
+  }
+]

@@ -13,6 +13,7 @@ public class FuzzyConsequent {
     private FuzzyVariable outputVariable;
     private String linguisticTerm;
     private double crispValue;
+    private boolean negated;
 
     // Constructor for Fuzzy (Mamdani) consequent
     public FuzzyConsequent(FuzzyVariable outputVariable, String linguisticTerm) {
@@ -20,6 +21,7 @@ public class FuzzyConsequent {
         this.outputVariable = outputVariable;
         this.linguisticTerm = linguisticTerm;
         this.crispValue = 0.0;
+        this.negated = false;
     }
 
     // Constructor for Crisp (Sugeno) consequent
@@ -28,6 +30,18 @@ public class FuzzyConsequent {
         this.outputVariable = outputVariable;
         this.linguisticTerm = null;
         this.crispValue = crispValue;
+    }
+
+    private FuzzyConsequent(FuzzyVariable outputVariable, String linguisticTerm, boolean negated) {
+        this.type = Type.FUZZY;
+        this.outputVariable = outputVariable;
+        this.linguisticTerm = linguisticTerm;
+        this.crispValue = 0.0;
+        this.negated = negated;
+    }
+
+    public static FuzzyConsequent createNegated(FuzzyVariable outputVariable, String linguisticTerm) {
+        return new FuzzyConsequent(outputVariable, linguisticTerm, true);
     }
 
     public Type getType() {
@@ -54,10 +68,15 @@ public class FuzzyConsequent {
         return type == Type.CRISP;
     }
 
+    public boolean isNegated() {
+        return negated;
+    }
+
     @Override
     public String toString() {
         if (type == Type.FUZZY) {
-            return outputVariable.getName() + " is " + linguisticTerm;
+            String prefix = negated ? "NOT " : "";
+            return outputVariable.getName() + " is " + prefix + linguisticTerm;
         } else {
             return outputVariable.getName() + " = " + crispValue;
         }

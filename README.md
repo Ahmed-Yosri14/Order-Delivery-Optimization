@@ -21,21 +21,222 @@ Complete fuzzy inference system featuring:
 - Mamdani and Sugeno inference engines
 - Customizable operators (AND, OR, Implication, Aggregation)
 - Natural language rule parsing
-- REST API with MongoDB persistence
+- REST API with JSON file persistence
 - Rule weights and soft delete (enable/disable)
+- Mixed operators support in single rules
 - Real-world case study: Smart Irrigation System
 
-### 3. **REST API & Database Integration**
+### 3. **REST API & JSON Storage**
 Professional API for fuzzy rule management:
 - CRUD operations for rules
 - Natural language rule input
-- MongoDB persistence
+- JSON file persistence (no database required)
 - Filtering and querying capabilities
 - Rule versioning with enable/disable
+- Mixed logical operators in rules
 
----
+## 🚀 Quick Start
+
+The project has two main applications:
+
+### 1. Main Demo (Default)
+```bash
+# Run the comprehensive fuzzy logic case study
+mvn compile exec:java
+```
+This runs **FuzzyLogicCaseStudyDemo** which demonstrates all fuzzy logic features including the JSON rule system.
+
+### 2. Interactive Rule Manager
+```bash  
+# Run the interactive console for managing rules
+mvn exec:java -Dexec.mainClass="FuzzyLogic.Rules.RuleManagerConsole"
+```
+This runs **RuleManagerConsole** - an interactive application to:
+- ➕ Add new rules
+- ✏️ Edit existing rules  
+- 🔄 Enable/disable rules
+- 🗑️ Delete rules
+- 📊 View statistics
+- 🧪 Test rule syntax
+
+### Rule Storage Format
+
+Rules are stored in `rules.json` with this simple format:
+
+```json
+[
+  {
+    "id": "rule_001",
+    "ruleText": "IF Soil Moisture is DRY AND Temperature is HOT THEN Water Duration is LONG WEIGHT 1.0",
+    "weight": 1.0,
+    "enabled": true
+  }
+]
+```
+
+### Programming Example
+
+```java
+// Load rules from JSON file
+SimpleRuleManager ruleManager = new SimpleRuleManager();
+List<RuleDocument> rules = ruleManager.loadEnabledRules();
+
+// Setup fuzzy variables
+SoilMoisture soil = new SoilMoisture();
+Temperature temp = new Temperature();
+WaterDuration water = new WaterDuration();
+
+soil.setValue(25);  // Dry soil
+temp.setValue(35);  // Hot temperature
+
+// Convert to fuzzy rules and run inference
+Map<String, FuzzyVariable> vars = Map.of(
+    "Soil Moisture", soil,
+    "Temperature", temp,
+    "Water Duration", water
+);
+
+List<FuzzyRule> fuzzyRules = new ArrayList<>();
+for (RuleDocument doc : rules) {
+    fuzzyRules.add(RuleConverter.toFuzzyRule(doc, vars));
+}
+
+MamdaniInferenceEngine engine = new MamdaniInferenceEngine(
+    vars, fuzzyRules, 0.0, 30.0
+);
+
+double wateringTime = engine.evaluate(); // Returns optimal minutes
+```
+
+## 📋 Rule Management
+
+### Adding Rules Programmatically
+
+```java
+SimpleRuleManager manager = new SimpleRuleManager();
+
+// Add a new rule
+manager.addRule(
+    "rule_new", 
+    "IF Soil Moisture is WET OR Rain Forecast is HEAVY THEN Water Duration is SHORT WEIGHT 0.9",
+    0.9, 
+    true
+);
+
+// Disable a rule (soft delete)
+manager.disableRule("rule_005");
+
+// Re-enable a rule
+manager.enableRule("rule_005");
+
+// Delete a rule permanently
+manager.deleteRule("rule_old");
+```
+
+### Rule Syntax
+
+Natural language rules support:
+
+1. **Simple rules**: `IF condition THEN output`
+2. **Weighted rules**: `IF condition THEN output WEIGHT 0.8`
+3. **AND rules**: `IF A is X AND B is Y THEN output`
+4. **OR rules**: `IF A is X OR B is Y THEN output`
+5. **Mixed operators**: `IF A is X AND B is Y OR C is Z THEN output`
+6. **NOT operator**: place `NOT` either before the variable or between `is` and the class (e.g., `IF Soil Moisture is NOT WET ...`).
+
+**Valid Variables and Classes:**
+- **Soil Moisture**: DRY, NORMAL, WET
+- **Temperature**: COLD, WARM, HOT  
+- **Rain Forecast**: NONE, LIGHT, HEAVY
+- **Water Duration**: SHORT, MEDIUM, LONG
+
+## 📊 Features Comparison
+
+## 🧪 Testing
+
+The project has two main applications:
+
+```bash
+# 1. Main Demo - Comprehensive fuzzy logic demonstration
+mvn compile exec:java
+
+# 2. Rule Manager Console - Interactive rule management
+mvn exec:java -Dexec.mainClass="FuzzyLogic.Rules.RuleManagerConsole"
+
+# Alternative: Test rule system programmatically 
+mvn exec:java -Dexec.mainClass="FuzzyLogic.Rules.TestRuleSystem"
+
+# Alternative: Test genetic algorithm
+mvn exec:java -Dexec.mainClass="GeneticAlgorithm.Main"
+```
+
+## 📁 Project Structure
+
+```
+src/main/java/
+├── FuzzyLogic/
+│   ├── FuzzyLogicCaseStudyDemo.java # 🎯 MAIN DEMO APPLICATION
+│   ├── Apis/                        # Rule management
+│   │   ├── SimpleRuleManager.java   # JSON file operations
+│   │   ├── RuleParser.java          # Natural language parsing
+│   │   ├── RuleDocument.java        # Rule data structure
+│   │   └── ...
+│   ├── Rules/                       # Rule processing
+│   │   ├── RuleManagerConsole.java  # 🎯 INTERACTIVE RULE MANAGER
+│   │   ├── FuzzyRule.java           # Enhanced with mixed operators
+│   │   ├── RuleConverter.java       # Rule conversion
+│   │   ├── TestRuleSystem.java      # Programmatic testing
+│   │   └── ...
+│   ├── Inference/                   # Inference engines
+│   ├── Variable/                    # Fuzzy variables  
+│   └── Operators/                   # Logical operators
+└── GeneticAlgorithm/                # GA implementation
+rules.json                          # 📄 RULE STORAGE FILE
+```
+
+### Key Files
+- **FuzzyLogicCaseStudyDemo.java** - Main demonstration of all fuzzy logic features
+- **RuleManagerConsole.java** - Interactive console for managing rules in JSON file
+- **rules.json** - Simple JSON file where all rules are stored
 
 ## 🎯 Use Cases
+
+- **Genetic Algorithm**: Route optimization, scheduling, resource allocation, parameter tuning
+- **Fuzzy Logic**: Control systems, decision support, pattern recognition, approximate reasoning  
+- **Combined**: Fuzzy-GA hybrid systems for complex optimization with uncertain parameters
+
+## 🏆 Summary
+
+This library provides a complete, production-ready implementation of soft computing techniques with modern features:
+
+### ✅ Achievements
+- **Zero Dependencies**: Removed MongoDB, now works with just Gson
+- **Mixed Operators**: Support for complex logical expressions
+- **Rule Weights**: Expert knowledge integration
+- **Soft Delete**: Non-destructive rule management
+- **JSON Storage**: Human-readable, version-control friendly
+- **Comprehensive Testing**: Multiple test classes for all features
+- **Natural Language**: Intuitive rule syntax
+- **Backward Compatible**: Existing code continues to work
+
+### 🚀 Getting Started
+1. Clone the repository
+2. Edit `rules.json` to define your fuzzy rules
+3. Run `mvn compile exec:java` to see the system in action
+4. Customize variables and rules for your domain
+
+### 📝 Dependencies
+```xml
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.10.1</version>
+</dependency>
+```
+
+## 📄 License
+
+This project is open source and available under the MIT License.
 
 - **Genetic Algorithm**: Route optimization, scheduling, resource allocation, parameter tuning
 - **Fuzzy Logic**: Control systems, decision support, pattern recognition, approximate reasoning
@@ -49,6 +250,24 @@ Professional API for fuzzy rule management:
 Control rule importance with weights from 0.0 to 1.0:
 - Expert rules: higher weights (0.9-1.0)
 - Experimental rules: lower weights (0.3-0.5)
+
+### 🔄 Mixed Operators in Rules (NEW)
+Support for complex logical expressions in single rules:
+- `IF Soil Moisture is DRY OR Temperature is HOT AND Rain Forecast is NONE THEN Water Duration is LONG`
+- Operators stored in sequence for proper evaluation
+
+### 💾 JSON File Storage (NEW)
+Replaced MongoDB with JSON file storage:
+- No database setup required
+- Human-readable rule storage
+- Portable and lightweight
+- Version control friendly
+
+### ♻️ Soft Delete (NEW)
+Enable/disable rules without permanent deletion:
+- `"enabled": true/false` in JSON
+- Disabled rules are automatically filtered out
+- Easy rule management and testing
 - Adjust influence without changing logic
 - Works with both Mamdani and Sugeno
 

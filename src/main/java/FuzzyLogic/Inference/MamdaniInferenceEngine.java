@@ -2,6 +2,7 @@ package FuzzyLogic.Inference;
 
 import FuzzyLogic.Membership.AggregatedFuzzySet;
 import FuzzyLogic.Membership.MembershipFunction;
+import FuzzyLogic.Membership.NegatedMembershipFunction;
 import FuzzyLogic.Operators.*;
 import FuzzyLogic.Rules.FuzzyConsequent;
 import FuzzyLogic.Rules.FuzzyRule;
@@ -80,6 +81,10 @@ public class MamdaniInferenceEngine {
             MembershipFunction outputMF = consequent.getOutputVariable()
                     .getMembershipFunction(linguisticTerm);
 
+            if (consequent.isNegated()) {
+                outputMF = new NegatedMembershipFunction(outputMF);
+            }
+
             System.out.println("[Mamdani] Rule " + (i + 1) + ": " + rule +
                     " -> firing=" + String.format("%.3f", firingStrength));
 
@@ -117,6 +122,9 @@ public class MamdaniInferenceEngine {
                 String linguisticTerm = consequent.getLinguisticTerm();
                 MembershipFunction outputMF = consequent.getOutputVariable()
                         .getMembershipFunction(linguisticTerm);
+                if (consequent.isNegated()) {
+                    outputMF = new NegatedMembershipFunction(outputMF);
+                }
                 aggregatedSet.addImpliedSet(outputMF, firingStrength, implicationOperator);
             }
         }
