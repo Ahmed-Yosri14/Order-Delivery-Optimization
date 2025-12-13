@@ -45,7 +45,7 @@
     "id": "2",
     "ruleText": "If Soil Moisture is Wet and Rain Forecast is Heavy or Temperature is Cold then Water Duration is Short",
     "weight": 1.0,
-    "enabled": true
+    "enabled": false
   },
   {
     "id": "rule_009",
@@ -54,7 +54,7 @@
     "enabled": true
   },
   {
-    "id": "IF Soil Moisture is not Wet AND Rain Forecast is not Heavy OR Temperature is not Cold THEN Water Duration is not Short",
+    "id": "rule_010",
     "ruleText": "IF Soil Moisture is not Wet AND Rain Forecast is not Heavy OR Temperature is not Cold THEN Water Duration is not Short",
     "weight": 1.0,
     "enabled": true
